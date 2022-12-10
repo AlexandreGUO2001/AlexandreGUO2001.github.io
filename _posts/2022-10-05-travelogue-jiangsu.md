@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Railway Travelogue to North Jiangsu
+title: Railway Travelogue (to the North part of Jiangsu Province)
 date: 2022-10-05
 description: Travelling by train to Nantong, Haimen, and Yancheng. (In Chinese)
 tags: Travel Railway
