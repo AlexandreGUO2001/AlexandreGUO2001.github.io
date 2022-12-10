@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Travelogue: The trip of River, Sea and Oasis
+title: Railway Travelogue to North Jiangsu
 date: 2022-10-05
 description: Travelling by train to Nantong, Haimen, and Yancheng. (In Chinese)
 tags: Travel Railway
