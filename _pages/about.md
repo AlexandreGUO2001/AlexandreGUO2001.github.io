@@ -1,5 +1,5 @@
 ---
-layout: About
+layout: about
 title: About
 permalink: /
 subtitle: 
@@ -10,7 +10,7 @@ profile:
   image_circular: false # crops the image to make it circular
   address: >
     <p>Photo taken on</p>
-    <p><a href='https://en.wikipedia.org/wiki/Simatai'>the Great Wall at Simatai</a></p>
+    <p>the Great Wall at Simatai</p>
     <p>Miyun County, Beijing, China</p>
 
 news: true  # includes a list of news items
