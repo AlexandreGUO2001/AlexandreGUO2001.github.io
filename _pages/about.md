@@ -18,11 +18,11 @@ selected_papers: false # includes a list of papers marked as "selected={true}"
 social: true  # includes social icons at the bottom of the page
 ---
 
-<b>About Me</b>
+<b><i>About Me</i></b>
 
-I am now a first-year <a href='https://ml.gatech.edu/'>Machine Learning</a> Ph.D. student at <a href='https://www.gatech.edu/'>Georgia Institute of Technology</a>, supervised by Professor <a href='https://yongxin.ae.gatech.edu/'>Yongxin Chen</a>. Previously, I obtained my Bachelor's degree in statistics from the <a href='http://www.math.pku.edu.cn/'>School of Mathematical Sciences</a>, <a href='https://www.pku.edu.cn/'>Peking University</a> in 2023, where I was mentored by Professor <a href='https://zcrabbit.github.io/'>Cheng Zhang</a>. I am born in <a href='https://en.wikipedia.org/wiki/Ningbo/'>Ningbo</a>, Zhejiang Province, China in 2001.
+I am now a first-year <a href='https://ml.gatech.edu/'>Machine Learning</a> Ph.D. student at <a href='https://www.gatech.edu/'>Georgia Institute of Technology</a>, supervised by Professor <a href='https://yongxin.ae.gatech.edu/'>Yongxin Chen</a>. Previously, I obtained my Bachelor's degree in Statistics from the <a href='http://www.math.pku.edu.cn/'>School of Mathematical Sciences</a>, <a href='https://www.pku.edu.cn/'>Peking University</a> in 2023, where I was mentored by Professor <a href='https://zcrabbit.github.io/'>Cheng Zhang</a>. I am born in <a href='https://en.wikipedia.org/wiki/Ningbo/'>Ningbo</a>, Zhejiang Province, China in 2001.
 
-<b>Academic Interests</b>
+<b><i>Interests</i></b>
 
 I am broadly interested in fields ranging from statistics, probability, and machine learning. 
 
