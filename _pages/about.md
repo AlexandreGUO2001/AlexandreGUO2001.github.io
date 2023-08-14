@@ -26,9 +26,11 @@ I am now a first-year <a href='https://ml.gatech.edu/'>Machine Learning</a> Ph.D
 
 I am broadly interested in fields ranging from statistics, probability, and machine learning. 
 
-<li><p><strong>Statistics</strong>: Bayesian Inference, Computational Statistics, Optimization, Sampling (Markov Chain Monte Carlo).</p></li>
-<li><p><strong>Probability</strong>: Optimal Transport and Gradient Flow Theory, Applied Stochastic Analysis, High-dimensional Probability.</p></li>
-<li><p><strong>Machine Learning</strong>: Deep Generative Modeling, Machine Learning Theory.</p></li>
+<p><strong>Statistics</strong>: Bayesian Inference, Computational Statistics, Optimization, Sampling (Markov Chain Monte Carlo).</p>
+
+<p><strong>Probability</strong>: Optimal Transport and Gradient Flow Theory, Applied Stochastic Analysis, High-dimensional Probability.</p>
+
+<p><strong>Machine Learning</strong>: Deep Generative Modeling, Machine Learning Theory.</p>
 
 The focus and goal of my research are two-fold: to reveal the fundamental principles behind the success of data-driven algorithms and to use these insights to develop accessible, efficient, and robust approaches for solving real-world problems that are essential and valuable for our society.
 
