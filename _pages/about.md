@@ -24,6 +24,15 @@ I am now a first-year <a href='https://ml.gatech.edu/'>Machine Learning</a> Ph.D
 
 <b>Academic Interests</b>
 
-I am broadly interested in fields ranging from <b>statistics</b>, <b>probability</b>, and <b>machine learning</b>. Please see the <a href='cv/'>CV</a> page for details.
+I am broadly interested in fields ranging from statistics, probability, and machine learning. 
+
+<li><p><strong>Statistics</strong>: Bayesian Inference, Computational Statistics, Optimization, Sampling (Markov Chain Monte Carlo).</p>
+</li>
+<li><p><strong>Probability</strong>: Optimal Transport and Gradient Flow Theory, Applied Stochastic Analysis, High-dimensional Probability.</p>
+</li>
+<li><p><strong>Machine Learning</strong>: Deep Generative Modeling, Machine Learning Theory.</p>
+</li>
 
 The focus and goal of my research are two-fold: to reveal the fundamental principles behind the success of data-driven algorithms and to use these insights to develop accessible, efficient, and robust approaches for solving real-world problems that are essential and valuable for our society.
+
+I am also interested in <i>la langue française</i> (the French language), vernaculars of Chinese and minority languages in China, <a href="https://www.openrailwaymap.org/">China's railway system</a>, <a href="https://www.flightradar24.com/">aviation</a>, and video games (especially action games such as <i>The Last of Us</i> and <i>Assassin's Creed</i>). I am an enthusiast of traveling.
