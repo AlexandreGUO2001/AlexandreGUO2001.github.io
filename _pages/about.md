@@ -20,17 +20,17 @@ social: true  # includes social icons at the bottom of the page
 
 <strong><em>About Me</em></strong>
 
-I am now a first-year <a href='https://ml.gatech.edu/'>Machine Learning</a> Ph.D. student at <a href='https://www.gatech.edu/'>Georgia Institute of Technology</a>, supervised by Professor <a href='https://yongxin.ae.gatech.edu/'>Yongxin Chen</a>. Previously, I obtained my Bachelor's degree in Statistics from the <a href='http://www.math.pku.edu.cn/'>School of Mathematical Sciences</a>, <a href='https://www.pku.edu.cn/'>Peking University</a> in 2023, where I was mentored by Professor <a href='https://zcrabbit.github.io/'>Cheng Zhang</a>. I am born in <a href='https://en.wikipedia.org/wiki/Ningbo/'>Ningbo</a>, Zhejiang Province, China in 2001.
+I am now a second-year <a href='https://ml.gatech.edu/'>Machine Learning</a> Ph.D. student at <a href='https://www.gatech.edu/'>Georgia Institute of Technology</a>, adviced by Professor <a href='https://yongxin.ae.gatech.edu/'>Yongxin Chen</a>. I also work closely with Professor <a href='https://mtao8.math.gatech.edu/index.html'>Molei Tao</a>. Previously, I obtained my Bachelor's degree in Statistics from the <a href='http://www.math.pku.edu.cn/'>School of Mathematical Sciences</a>, <a href='https://www.pku.edu.cn/'>Peking University</a> in 2023, where I was mentored by Professor <a href='https://zcrabbit.github.io/'>Cheng Zhang</a>. I am born in <a href='https://en.wikipedia.org/wiki/Ningbo/'>Ningbo</a>, <a href='https://en.wikipedia.org/wiki/Zhejiang'>Zhejiang</a>, China in 2001.
 
 <strong><em>Interests</em></strong>
 
 I am broadly interested in fields ranging from statistics, probability, and machine learning. 
 
-<strong>Statistics</strong>: Bayesian Inference, Computational Statistics, Optimization, Sampling (Markov Chain Monte Carlo).
+<strong>Statistics</strong>: Sampling (Markov Chain Monte Carlo), Optimization, Computational Statistics, Bayesian Inference.
 
-<strong>Probability</strong>: Optimal Transport and Gradient Flow Theory, Applied Stochastic Analysis, High-dimensional Probability.
+<strong>Probability</strong>: Optimal Transport and Gradient Flow Theory, Applied Stochastic Analysis.
 
-<strong>Machine Learning</strong>: Deep Generative Modeling, Machine Learning Theory.
+<strong>Machine Learning</strong>: Generative AI, Large Language and Vision Models, Machine Learning Theory.
 
 The focus and goal of my research are two-fold: to reveal the fundamental principles behind the success of data-driven algorithms and to use these insights to develop accessible, efficient, and robust approaches for solving real-world problems that are essential and valuable for our society.
 
