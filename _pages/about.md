@@ -9,11 +9,11 @@ profile:
   image: prof_pic.jpg
   image_circular: false # crops the image to make it circular
   address: >
-    <p>950 Marietta St NW</p>
-    <p>Atlanta, GA 30318</p>
+    <p>756 W Peachtree St NW</p>
+    <p>Atlanta, GA 30308</p>
 
 news: true  # includes a list of news items
-latest_posts: true  # includes a list of the newest posts
+latest_posts: false  # includes a list of the newest posts
 selected_papers: false # includes a list of papers marked as "selected={true}"
 social: true  # includes social icons at the bottom of the page
 ---
@@ -24,14 +24,14 @@ I am now a second-year <a href='https://ml.gatech.edu/'>Machine Learning</a> Ph.
 
 <strong><em>Interests</em></strong>
 
-I am broadly interested in fields ranging from statistics, probability, and machine learning. 
+I am broadly interested in fields ranging from statistics, probability, and machine learning:
 
-<strong>Statistics</strong>: Sampling (Markov Chain Monte Carlo), Optimization, Computational Statistics, Bayesian Inference.
+<strong>Statistics</strong>: Sampling (Markov Chain Monte Carlo), Optimization, Computational Statistics, Theoretical Machine Learning, Bayesian Inference.
 
 <strong>Probability</strong>: Optimal Transport and Gradient Flow Theory, Applied Stochastic Analysis.
 
-<strong>Machine Learning</strong>: Generative AI, Large Language and Vision Models, Machine Learning Theory.
+<strong>Machine Learning</strong>: Generative AI, Large Language and Vision Models.
 
 The focus and goal of my research are two-fold: to reveal the fundamental principles behind the success of data-driven algorithms and to use these insights to develop accessible, efficient, and robust approaches for solving real-world problems that are essential and valuable for our society.
 
-I am also interested in <i>la langue française</i> (the French language), vernaculars of Chinese and minority languages in China, <a href="https://www.openrailwaymap.org/">China's railway system</a>, <a href="https://www.flightradar24.com/">aviation</a>, architecture, and video games (especially action games such as <i>The Last of Us</i> and <i>Assassin's Creed</i>). I am an enthusiast of traveling.
+I am also interested in <i>la langue française</i> (the French language), vernaculars of Chinese and minority languages in China, linguistics, political science, <a href="https://www.openrailwaymap.org/">China's railway system</a>, <a href="https://www.flightradar24.com/">aviation</a>, architecture, and video games (especially action games such as <i>The Last of Us</i>, <i>Assassin's Creed</i>, and the <i>Metro</i> series). I am also an enthusiast of traveling. Some of my highly recommended destinations possessing profound historical and cultural heritage include <a href='https://en.wikipedia.org/wiki/Hangzhou'>Hangzhou</a>, <a href='https://en.wikipedia.org/wiki/Yangzhou'>Yangzhou</a>, <a href='https://en.wikipedia.org/wiki/Datong'>Datong</a>, and <a href='https://en.wikipedia.org/wiki/Macau'>Macau</a>, and my hometown <a href='https://en.wikipedia.org/wiki/Ningbo/'>Ningbo</a>.

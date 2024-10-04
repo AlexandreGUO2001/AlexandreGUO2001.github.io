@@ -2,20 +2,26 @@
 ---
 
 @article{guo2024plug,
+  % abbr={},
   title={Plug-and-Play Controllable Generation for Discrete Masked Models},
   author={Guo, Wei and Zhu, Yuchen and Tao, Molei and Chen, Yongxin},
   journal={arXiv preprint arXiv:2410.02143},
-  year={2024}
+  html = {https://arxiv.org/abs/2410.02143},
+  year={2024},
+  abstract={This article makes discrete masked models for the generative modeling of discrete data controllable. The goal is to generate samples of a discrete random variable that adheres to a posterior distribution, satisfies specific constraints, or optimizes a reward function. This methodological development enables broad applications across downstream tasks such as class-specific image generation and protein design. Existing approaches for controllable generation of masked models typically rely on task-specific fine-tuning or additional modifications, which can be inefficient and resource-intensive. To overcome these limitations, we propose a novel plug-and-play framework based on importance sampling that bypasses the need for training a conditional score. Our framework is agnostic to the choice of control criteria, requires no gradient information, and is well-suited for tasks such as posterior sampling, Bayesian inverse problems, and constrained generation. We demonstrate the effectiveness of our approach through extensive experiments, showcasing its versatility across multiple domains, including protein design.}
 }
 
 @article{guo2024provable,
+  % abbr={},
   title={Provable Benefit of Annealed Langevin Monte Carlo for Non-log-concave Sampling},
   author={Guo, Wei and Tao, Molei and Chen, Yongxin},
   journal={arXiv preprint arXiv:2407.16936},
-  year={2024}
+  html = {https://arxiv.org/abs/2407.16936},
+  year={2024},
+  abstract={We consider the outstanding problem of sampling from an unnormalized density that may be non-log-concave and multimodal. To enhance the performance of simple Markov chain Monte Carlo (MCMC) methods, techniques of annealing type have been widely used. However, quantitative theoretical guarantees of these techniques are under-explored. This study takes a first step toward providing a non-asymptotic analysis of annealed MCMC. Specifically, we establish, for the first time, an oracle complexity of $\widetilde{O}\left(\frac{d\beta^2{\cal A}^2}{\varepsilon^6}\right)$ for the simple annealed Langevin Monte Carlo algorithm to achieve $\varepsilon^2$ accuracy in Kullback-Leibler divergence to the target distribution $\pi\propto{\rm e}^{-V}$ on $\mathbb{R}^d$ with $\beta$-smooth potential $V$. Here, ${\cal A}$ represents the action of a curve of probability measures interpolating the target distribution $\pi$ and a readily sampleable distribution.}
 }
 @thesis{guo2023theoretical,
-  title={Theoretical Analysis of the Approximation Properties of Score-Based Generative Models},
+  title={[Bachelor's Thesis] Theoretical Analysis of the Approximation Properties of Score-Based Generative Models},
   author={Wei Guo},
   year={2023},
   type={Bachelor's Thesis},

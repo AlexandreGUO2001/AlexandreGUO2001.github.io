@@ -1,1 +1,15 @@
+# "adams":
+#   - firstname: ["Edwin", "E.", "E. P.", "Edwin Plimpton"]
+#     url: https://en.wikipedia.org/wiki/Edwin_Plimpton_Adams
 
+"chen":
+  - firstname: ["Yongxin", "Y."]
+    url: https://yongxin.ae.gatech.edu/
+
+"tao":
+  - firstname: ["Molei", "M."]
+    url: https://mtao8.math.gatech.edu/index.html
+
+"zhu":
+  - firstname: ["Yuchen", "Y."]
+    url: https://yuchen-zhu-zyc.github.io/
