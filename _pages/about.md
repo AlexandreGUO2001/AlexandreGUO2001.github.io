@@ -22,6 +22,8 @@ social: true  # includes social icons at the bottom of the page
 
 I am now a second-year <a href='https://ml.gatech.edu/'>Machine Learning</a> Ph.D. student at <a href='https://www.gatech.edu/'>Georgia Institute of Technology</a>, adviced by Professor <a href='https://yongxin.ae.gatech.edu/'>Yongxin Chen</a>. I also work closely with Professor <a href='https://mtao8.math.gatech.edu/index.html'>Molei Tao</a>. Previously, I obtained my Bachelor's degree in Statistics from the <a href='http://www.math.pku.edu.cn/'>School of Mathematical Sciences</a>, <a href='https://www.pku.edu.cn/'>Peking University</a> in 2023, where I was mentored by Professor <a href='https://zcrabbit.github.io/'>Cheng Zhang</a>. I am born in <a href='https://en.wikipedia.org/wiki/Ningbo/'>Ningbo</a>, <a href='https://en.wikipedia.org/wiki/Zhejiang'>Zhejiang</a>, China in 2001.
 
+My latest CV can be found <a href='https://alexandreguo2001.github.io/assets/pdf/Wei_Guo_CV.pdf'>here</a>.
+
 <strong><em>Interests</em></strong>
 
 I am broadly interested in fields ranging from statistics, probability, and machine learning:
