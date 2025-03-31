@@ -5,6 +5,8 @@
 "chen":
   - firstname: ["Yongxin", "Y."]
     url: https://yongxin.ae.gatech.edu/
+  - firstname: ["Haoxuan", "H."]
+    url: https://haoxuanstevec00.github.io/index.html
 
 "tao":
   - firstname: ["Molei", "M."]
@@ -13,3 +15,7 @@
 "zhu":
   - firstname: ["Yuchen", "Y."]
     url: https://yuchen-zhu-zyc.github.io/
+
+"ren":
+  - firstname: ["Yinuo", "Y."]
+    url: https://web.stanford.edu/~renyinuo/

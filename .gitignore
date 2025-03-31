@@ -8,4 +8,10 @@ _site
 .tweet-cache
 Gemfile.lock
 vendor
-
+-blx.bib
+.aux
+.bbl
+.blg
+.out
+.run.xml
+.syntex.gz
