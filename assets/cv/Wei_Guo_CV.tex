@@ -1,0 +1,100 @@
+\documentclass{resume} % Use the custom resume.cls style
+\usepackage[dvipsnames]{xcolor}
+\usepackage{hyperref}
+\usepackage[backend=bibtex, style=numeric, sorting=ydnt, maxnames=99, maxcitenames=99]{biblatex}
+\addbibresource{ref.bib}
+
+\usepackage[left=0.75in,top=0.6in,right=0.75in,bottom=0.1in]{geometry} % Document margins
+\newcommand{\tab}[1]{\hspace{.2667\textwidth}\rlap{#1}}
+\newcommand{\itab}[1]{\hspace{0em}\rlap{#1}}
+\name{Wei Guo} % Your name
+\address{Homepage: \href{https://alexandreguo2001.github.io/}{\texttt{https://alexandreguo2001.github.io/}}}
+\address{
+    \href{https://scholar.google.com/citations?user=0r_TzzkAAAAJ&hl=en}{Google Scholar} \\ 
+    \href{https://github.com/AlexandreGUO2001/}{Github} \\
+    \href{https://www.linkedin.com/in/wei-guo-264b97293/}{LinkedIn}
+}
+\address{Email: \href{mailto:wei.guo@gatech.edu}{\texttt{wei.guo@gatech.edu}}}
+
+
+\renewenvironment{rSection}[1]{
+\sectionskip
+\textcolor{black}{\textbf{\textsc{#1}}}
+\sectionlineskip
+\hrule
+\begin{list}{}{
+\setlength{\leftmargin}{1.5em}
+}
+\item[]
+}{
+\end{list}
+}
+
+
+
+\begin{document}
+\begin{rSection}{Education}
+{\bf Georgia Institute of Technology, Machine Learning Center} \hfill {\em Aug 2023 -- Present} 
+\\ PhD in Machine Learning\hfill
+\\ \textbf{Advisor}: Professor \href{https://yongxin.ae.gatech.edu/}{Yongxin Chen} and \href{https://mtao8.math.gatech.edu/index.html}{Molei Tao}
+
+{\bf Peking University, School of Mathematical Sciences} \hfill {\em Sep 2019 -- Jul 2023} 
+\\ B.S. in Statistics
+\\ \textbf{GPA}: 3.848/4.0; rank: 5/44 \hfill
+\\ \textbf{Advisor}: Professor \href{https://zcrabbit.github.io/}{Cheng Zhang} 
+\\ \textbf{Awards}: merit student in the academic year of 2019-2020; merit student pacesetter in the academic year of 2020-2021; merit student in the academic year of 2021-2022; 2023 Beijing Outstanding Undergraduate Graduate Award.
+\end{rSection}
+
+\begin{rSection}{Research Interests}
+    \begin{itemize}
+        \item \textbf{Statistics}: Sampling (Markov Chain Monte Carlo), Computational Statistics, Machine Learning Theory.
+        \item \textbf{Probability}: Optimal Transport, Applied Stochastic Analysis, Statistical Physics.
+        \item \textbf{Machine Learning}: Generative Modeling, Vision and Language Models.
+    \end{itemize}
+\end{rSection}
+
+
+% \begin{rSection}{Research Experience}
+% \begin{rSubsection}{Project name 1 \cite{paper1}}{Jan 2024 - Present}{Supervisors: \href{https://example.com/}{Dr. A}, \href{https://example.com/}{Prof. B}, and \href{https://example.com/}{Prof. C}}{CMU}
+% \item Proposed ...
+% \item Found ...
+% \item Completed ...
+% \item Modified ...
+% \item Proposed ...
+% \item Finished ...
+% \end{rSubsection}
+
+
+% \begin{rSubsection}{Project name 2 \cite{paper2}}{Dec 2023 - Feb 2024}{Supervisors: \href{https://example.weebly.com/}{Dr. A} and \href{https://www.ece.cmu.edu/directory/bios/example}{Prof. B}}{CMU}
+% \item Ran experiments for ...
+% \item Organized ...
+% \item Explored ... 
+% \item Proposed ...
+% \item Finished ...
+% \end{rSubsection}
+% \end{rSection}
+
+
+\begin{rSection}{Publications and Preprints (in reversed chronological order)} \itemsep -2pt
+\nocite{*}
+\leavevmode\printbibliography[heading=none]
+
+\end{rSection}
+% \begin{rSection}{Achievements} \itemsep -2pt
+% {Scholarship, awarded by xxx}\hfill {\em Summer 2023} \\
+% {Scholarship, awarded by xxx}\hfill {\em Fall 2022} \\
+% {Scholarship, awarded by xxx} \hfill {\em Summer 2022} \\
+% {Scholarship, awarded by xxx}\hfill {\em Fall 2019}
+% \end{rSection}
+
+\begin{rSection}{Technical Skills} \itemsep -2pt
+\begin{itemize}
+    \item \textbf{Mathematics and Statistics}: Markov chain Monte Carlo, optimization, stochastic analysis, optimal transport, computational statistics, applied partial differential equations.
+    \item \textbf{Machine learning}: computer vision, natural language processing.
+    \item \textbf{Programming}: proficient programming Python.
+    \item \textbf{Languages}: Chinese (Mandarin and Wu dialect, native), English (proficient), French (beginner).
+\end{itemize}
+    
+
+\end{rSection}
+\end{document}
