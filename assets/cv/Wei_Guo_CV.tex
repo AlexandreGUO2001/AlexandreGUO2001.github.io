@@ -1,6 +1,7 @@
 \documentclass{resume} % Use the custom resume.cls style
 \usepackage[dvipsnames]{xcolor}
 \usepackage{hyperref}
+\usepackage{enumitem}
 \usepackage[backend=bibtex, style=numeric, sorting=ydnt, maxnames=99, maxcitenames=99]{biblatex}
 \addbibresource{ref.bib}
 
@@ -8,7 +9,7 @@
 \newcommand{\tab}[1]{\hspace{.2667\textwidth}\rlap{#1}}
 \newcommand{\itab}[1]{\hspace{0em}\rlap{#1}}
 \name{Wei Guo} % Your name
-\address{Homepage: \href{https://alexandreguo2001.github.io/}{\texttt{https://alexandreguo2001.github.io/}}}
+\address{Homepage: \href{https://alexandreguo2001.github.io/}{\texttt{alexandreguo2001.github.io}}}
 \address{
     \href{https://scholar.google.com/citations?user=0r_TzzkAAAAJ&hl=en}{Google Scholar} \\ 
     \href{https://github.com/AlexandreGUO2001/}{Github} \\
@@ -19,7 +20,7 @@
 
 \renewenvironment{rSection}[1]{
 \sectionskip
-\textcolor{black}{\textbf{\textsc{#1}}}
+\textcolor{black}{\textsc{#1}}
 \sectionlineskip
 \hrule
 \begin{list}{}{
@@ -35,7 +36,7 @@
 \begin{document}
 \begin{rSection}{Education}
 {\bf Georgia Institute of Technology, Machine Learning Center} \hfill {\em Aug 2023 -- Present} 
-\\ PhD in Machine Learning\hfill
+\\ Ph.D. in Machine Learning\hfill
 \\ \textbf{Advisor}: Professor \href{https://yongxin.ae.gatech.edu/}{Yongxin Chen} and \href{https://mtao8.math.gatech.edu/index.html}{Molei Tao}
 
 {\bf Peking University, School of Mathematical Sciences} \hfill {\em Sep 2019 -- Jul 2023} 
@@ -46,7 +47,7 @@
 \end{rSection}
 
 \begin{rSection}{Research Interests}
-    \begin{itemize}
+    \begin{itemize}[leftmargin=0in]
         \item \textbf{Statistics}: Sampling (Markov Chain Monte Carlo), Computational Statistics, Machine Learning Theory.
         \item \textbf{Probability}: Optimal Transport, Applied Stochastic Analysis, Statistical Physics.
         \item \textbf{Machine Learning}: Generative Modeling, Vision and Language Models.
@@ -75,20 +76,41 @@
 % \end{rSection}
 
 
-\begin{rSection}{Publications and Preprints (in reversed chronological order)} \itemsep -2pt
-\nocite{*}
-\leavevmode\printbibliography[heading=none]
-
+\begin{rSection}{Preprints and Publications} 
+    (In reversed chronological order. $^*$ denotes equal contribution or alphabetical order)
+    \itemsep -2pt
+    \nocite{*}\leavevmode\printbibliography[heading=none]
 \end{rSection}
-% \begin{rSection}{Achievements} \itemsep -2pt
-% {Scholarship, awarded by xxx}\hfill {\em Summer 2023} \\
-% {Scholarship, awarded by xxx}\hfill {\em Fall 2022} \\
-% {Scholarship, awarded by xxx} \hfill {\em Summer 2022} \\
-% {Scholarship, awarded by xxx}\hfill {\em Fall 2019}
-% \end{rSection}
 
+
+
+\begin{rSection}{Teaching Assistant} \itemsep -2pt
+\href{https://ae3531a.notion.site/Course-Syllabus-Fall-2024-049faa69bedb4dd2b9b353318f52d5d6}{AE 3531: Control System Analysis and Design}. Lecturer: \href{https://research.gatech.edu/people/lu-gan}{Lu Gan}.\hfill {\em Fall 2024} \\
+AE 8803: Optimal Transport Theory and Applications. Lecturer: \href{https://yongxin.ae.gatech.edu/}{Yongxin Chen}.\hfill {\em Spring 2025} \\
+\end{rSection}
+
+
+\begin{rSection}{Community Service} \itemsep -2pt
+    Served as a reviewer for ICLR 2023 (1 paper) and ICLR 2024 (3 papers).
+\end{rSection}
+
+
+\newpage
+
+
+\begin{rSection}{Awards} \itemsep -2pt
+    PKU merit student in the academic year of 2019-2020 \hfill {\em Oct 2020} \\
+    PKU merit student pacesetter in the academic year of 2020-2021 \hfill {\em Oct 2021} \\
+    PKU merit student in the academic year of 2021-2022 \hfill {\em Oct 2022} \\
+    2023 Beijing Outstanding Undergraduate Graduate Award \hfill {\em Jul 2023} \\
+    Best poster award at Yale FDS conference ``Recent Advances and Future Directions for Sampling'' \\
+    \phantom{.} \hfill {\em Oct 2024} \\
+\end{rSection}
+
+
+    
 \begin{rSection}{Technical Skills} \itemsep -2pt
-\begin{itemize}
+\begin{itemize}[leftmargin=0in]
     \item \textbf{Mathematics and Statistics}: Markov chain Monte Carlo, optimization, stochastic analysis, optimal transport, computational statistics, applied partial differential equations.
     \item \textbf{Machine learning}: computer vision, natural language processing.
     \item \textbf{Programming}: proficient programming Python.

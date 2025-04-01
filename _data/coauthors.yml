@@ -1,21 +1,25 @@
-# "adams":
-#   - firstname: ["Edwin", "E.", "E. P.", "Edwin Plimpton"]
-#     url: https://en.wikipedia.org/wiki/Edwin_Plimpton_Adams
-
-"chen":
-  - firstname: ["Yongxin", "Y."]
+"Chen":
+  - firstname: ["Yongxin"]
     url: https://yongxin.ae.gatech.edu/
-  - firstname: ["Haoxuan", "H."]
-    url: https://haoxuanstevec00.github.io/index.html
+  - firstname: ["Haoxuan"]
+    url: https://haoxuanstevec00.github.io/
 
-"tao":
-  - firstname: ["Molei", "M."]
-    url: https://mtao8.math.gatech.edu/index.html
+"Tao":
+  - firstname: ["Molei"]
+    url: https://mtao8.math.gatech.edu/
 
-"zhu":
-  - firstname: ["Yuchen", "Y."]
+"Zhu":
+  - firstname: ["Yuchen"]
     url: https://yuchen-zhu-zyc.github.io/
 
-"ren":
-  - firstname: ["Yinuo", "Y."]
+"Ren":
+  - firstname: ["Yinuo"]
     url: https://web.stanford.edu/~renyinuo/
+
+"Ying":
+  - firstname: ["Lexing"]
+    url: https://web.stanford.edu/~lexing/
+
+"Rotskoff":
+  - firstname: ["Grant", "Grant M."]
+    url: https://statmech.stanford.edu/
