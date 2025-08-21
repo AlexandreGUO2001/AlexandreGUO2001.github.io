@@ -14,7 +14,7 @@
 
 "Ren":
   - firstname: ["Yinuo"]
-    url: https://web.stanford.edu/~renyinuo/
+    url: https://yinuoren.su.domains/
 
 "Ying":
   - firstname: ["Lexing"]
@@ -23,3 +23,11 @@
 "Rotskoff":
   - firstname: ["Grant", "Grant M", "Grant M."]
     url: https://statmech.stanford.edu/
+
+"Choi":
+  - firstname: ["Jaemoo"]
+    url: https://scholar.google.com/citations?user=Ba2G6sIAAAAJ
+
+"Liu":
+  - firstname: ["Guan-Horng"]
+    url: https://ghliu.github.io/

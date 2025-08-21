@@ -1,44 +1,44 @@
-- title: General Information
-  type: map
-  contents:
-    - name: Full Name
-      value: Wei Guo
-    - name: Date of Birth
-      value: January 31, 2001
-    - name: Languages
-      value: Chinese [Mandarin and <a href="https://en.wikipedia.org/wiki/Wu_Chinese">Wu</a> (<a href="https://en.wikipedia.org/wiki/Ningbo_dialect">Ningbo Dialect</a>), native], English [fluent], French [beginner]
+# - title: General Information
+#   type: map
+#   contents:
+#     - name: Full Name
+#       value: Wei Guo
+#     - name: Date of Birth
+#       value: January 31, 2001
+#     - name: Languages
+#       value: Chinese [Mandarin and <a href="https://en.wikipedia.org/wiki/Wu_Chinese">Wu</a> (<a href="https://en.wikipedia.org/wiki/Ningbo_dialect">Ningbo Dialect</a>), native], English [fluent], French [beginner]
       
-- title: Education
-  type: time_table
-  contents:
-    - title: Ph.D. in Machine Learning (expected)
-      institution: Georgia Institute of Technology, Atlanta, GA
-      year: 2028
-    - title: B.S. in Statistics
-      institution: Peking University, Beijing, China
-      year: 2023
+# - title: Education
+#   type: time_table
+#   contents:
+#     - title: Ph.D. in Machine Learning (expected)
+#       institution: Georgia Institute of Technology, Atlanta, GA
+#       year: 2028
+#     - title: B.S. in Statistics
+#       institution: Peking University, Beijing, China
+#       year: 2023
 
-- title: Academic Interests
-  type: nested_list
-  contents:
-    - title: Statistics.
-      items: 
-        - Bayesian Inference.
-        - Computational Statistics.
-        - Optimization.
-        - Sampling, Markov Chain Monte Carlo.
-    - title: Probability.
-      items:
-        - Optimal Transport and Gradient Flow Theory.
-        - Applied Stochastic Analysis.
-        - High-dimensional Probability.
-    - title: Machine Learning.
-      items:
-        - Probabilistic Machine Learning.
-        - Deep Generative Modeling.
-        - Machine Learning Theory.
+# - title: Academic Interests
+#   type: nested_list
+#   contents:
+#     - title: Statistics.
+#       items: 
+#         - Bayesian Inference.
+#         - Computational Statistics.
+#         - Optimization.
+#         - Sampling, Markov Chain Monte Carlo.
+#     - title: Probability.
+#       items:
+#         - Optimal Transport and Gradient Flow Theory.
+#         - Applied Stochastic Analysis.
+#         - High-dimensional Probability.
+#     - title: Machine Learning.
+#       items:
+#         - Probabilistic Machine Learning.
+#         - Deep Generative Modeling.
+#         - Machine Learning Theory.
 
-- title: Other Interests
-  type: list
-  contents:
-    - I am also interested in <i>la langue française</i> (the French language), vernaculars of Chinese and minority languages in China, <a href="https://www.openrailwaymap.org/">China's railway system</a>, aviation, and video games (especially action games such as <i>The Last of Us</i> and <i>Assassin's Creed</i>). I am an enthusiast of traveling.
+# - title: Other Interests
+#   type: list
+#   contents:
+#     - I am also interested in <i>la langue française</i> (the French language), vernaculars of Chinese and minority languages in China, <a href="https://www.openrailwaymap.org/">China's railway system</a>, aviation, and video games (especially action games such as <i>The Last of Us</i> and <i>Assassin's Creed</i>). I am an enthusiast of traveling.
