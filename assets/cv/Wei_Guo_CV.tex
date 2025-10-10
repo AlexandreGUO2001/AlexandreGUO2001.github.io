@@ -5,7 +5,12 @@
 \usepackage[backend=bibtex, style=numeric, sorting=ydnt, maxnames=99, maxcitenames=99]{biblatex}
 \addbibresource{ref.bib}
 \usepackage{palatino}
-\usepackage[left=0.75in,top=0.6in,right=0.75in,bottom=0.1in]{geometry} % Document margins
+\usepackage[left=0.75in,top=0.75in,right=0.75in,bottom=0.75in]{geometry} % Document margins
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0pt}
 
 \name{Wei Guo}
 \address{Personal website: \href{https://alexandreguo2001.github.io/}{\texttt{alexandreguo2001.github.io}}}
@@ -46,7 +51,7 @@
 
 \begin{rSection}{Research Interests}
     \begin{itemize}[leftmargin=0in]
-        \item \textbf{Statistics and Probability}: Theoretical analysis and practical design of sampling algorithms (Markov Chain Monte Carlo, non-equilibrium (e.g., denoising diffusion, stochastic localization) sampling, or learning-based neural samplers); Applied stochastic analysis with applications to optimal transport, stochastic optimal control, and statistical physics.
+        \item \textbf{Statistics and Probability}: Theoretical analysis and practical design of sampling algorithms (Markov chain Monte Carlo, non-equilibrium (e.g., denoising diffusion, stochastic localization) sampling, or learning-based neural samplers); Applied stochastic analysis with applications to optimal transport, stochastic optimal control, and statistical physics.
         \item \textbf{Machine Learning}: Generative modeling, with a particular focus on (continuous/discrete) diffusion and flow-based models and with applications to vision and language.
     \end{itemize}
 \end{rSection}
@@ -122,4 +127,7 @@ Lecturer: \href{https://yongxin.ae.gatech.edu/}{Yongxin Chen}.
 
 
 \end{rSection}
+
+\fancyfoot[R]{\footnotesize Last updated: \today}
+
 \end{document}
