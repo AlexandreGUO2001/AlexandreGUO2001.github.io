@@ -1,6 +1,18 @@
 \documentclass{resume} % Use the custom resume.cls style
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{cmap}
+\input{glyphtounicode}
+\pdfgentounicode=1
 \usepackage[dvipsnames]{xcolor}
+\definecolor{LinkNavy}{HTML}{12324A}
 \usepackage{hyperref}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=LinkNavy,
+    citecolor=black,
+    urlcolor=LinkNavy
+}
 \usepackage{enumitem}
 \usepackage[backend=bibtex, style=numeric, sorting=ydnt, maxnames=99, maxcitenames=99]{biblatex}
 \addbibresource{ref.bib}
@@ -25,7 +37,7 @@
 
 \renewenvironment{rSection}[1]{
 \sectionskip
-\textcolor{black}{\textsc{#1}}
+\textcolor{LinkNavy}{\textbf{\textsc{#1}}}
 \sectionlineskip
 \hrule
 \begin{list}{}{
@@ -39,6 +51,10 @@
 
 
 \begin{document}
+\begin{rSection}{Research Summary}
+I study diffusion-based generative models and sampling algorithms, with a current focus on continuous/discrete diffusion LLMs.
+\end{rSection}
+
 \begin{rSection}{Education}
 {\bf \href{https://www.gatech.edu/}{Georgia Institute of Technology}, \href{https://ml.gatech.edu/}{Machine Learning Center}} \hfill {\em Aug 2023 -- Present} 
 \\ Ph.D. in Machine Learning\hfill
@@ -52,7 +68,7 @@
 
 \begin{rSection}{Research Interests}
     \begin{itemize}[leftmargin=0in]
-        \item \textbf{Machine Learning}: Generative modeling, with a particular focus on (continuous/discrete) diffusion and flow-based models and with applications to vision, language, and sciences.
+        \item \textbf{Machine Learning}: Diffusion-based generative AI, with a focus on continuous/discrete diffusion language models and post-training (including distillation, inference-time scaling, and reinforcement learning, etc.).
         \item \textbf{Statistics and Probability}: Theoretical analysis and practical design of sampling algorithms (Markov chain Monte Carlo, non-equilibrium (e.g., denoising diffusion, stochastic localization) sampling, or learning-based neural samplers); Applied stochastic analysis with applications to optimal transport, stochastic optimal control, and statistical physics.
     \end{itemize}
 \end{rSection}
@@ -89,7 +105,7 @@
 
 \begin{rSection}{Teaching Experience} \itemsep -2pt
 \begin{itemize}[leftmargin=0in]
-    \item Served (or currently serving) as a teaching assistant for the following courses at Georgia Tech:
+    \item Served as a teaching assistant for the following courses at Georgia Tech:
 \end{itemize}
 \href{https://ae3531a.notion.site/Course-Syllabus-Fall-2024-049faa69bedb4dd2b9b353318f52d5d6}{AE 3531: Control System Analysis and Design}. 
 Lecturer: \href{https://research.gatech.edu/people/lu-gan}{Lu Gan}.
@@ -129,6 +145,7 @@ Lecturer: \href{https://yongxin.ae.gatech.edu/}{Yongxin Chen}.
     2023 Beijing Outstanding Undergraduate Graduate Award \hfill {\em Jul 2023} \\
     Best poster award at Yale FDS conference ``Recent Advances and Future Directions for Sampling'' \\
     \phantom{.} \hfill {\em Oct 2024} \\
+    Gold reviewer award at ICML 2026 \hfill {\em May 2026} \\
 \end{rSection}
 
 
@@ -136,8 +153,9 @@ Lecturer: \href{https://yongxin.ae.gatech.edu/}{Yongxin Chen}.
 \begin{rSection}{Technical Skills} \itemsep -2pt
 \begin{itemize}[leftmargin=0in]
     \item \textbf{Mathematics and Statistics}: Markov chain Monte Carlo, convex optimization, stochastic analysis, optimal transport, applied partial differential equations.
-    \item \textbf{Machine learning}: computer vision, natural language processing.
-    \item \textbf{Programming}: proficient programming in Python (including PyTorch).
+    \item \textbf{Machine learning}: Diffusion/flow-based models, large language models, reinforcement learning.
+    \item \textbf{ML systems}: Familiar with PyTorch distributed training (DDP/FSDP).
+    \item \textbf{Programming}: Proficient in Python, including PyTorch.
     \item \textbf{Languages}: Chinese (Mandarin and Wu dialect, native), English (proficient), French (beginner).
 \end{itemize}
 

@@ -1,68 +1,140 @@
+---
+description: Project guidance for Wei Guo's Jekyll personal website
+alwaysApply: true
+---
+
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This is the single source of agent guidance for this repository. `AGENTS.md`
+and `.cursor/rules/CLAUDE.mdc` are intended to be symlinks to this file so
+Claude Code, Codex, and Cursor read the same project instructions.
 
 ## What This Is
 
-Academic personal website for Wei Guo (郭纬), a Georgia Tech ML PhD student. Built with **Jekyll** using the **al-folio** theme (by alshedivat), deployed to GitHub Pages.
+Academic personal website for Wei Guo, a Georgia Tech ML PhD student.
+The site is built with Jekyll using the al-folio theme and deployed to GitHub
+Pages from the generated `_site` directory.
 
 ## Build & Serve Commands
 
 ```bash
-# Local development (recommended on Windows — avoids Ruby setup)
+# Local development with the prebuilt al-folio Docker image
 docker-compose up                    # serves at http://localhost:8080
+
+# Local development with the repo Dockerfile
+docker-compose -f docker-local.yml up # serves at http://localhost:8080
 
 # Native Ruby
 bundle install
 bundle exec jekyll serve --lsi       # serves at http://localhost:4000
 
-# Production build (used in CI)
+# Production build, matching CI
 JEKYLL_ENV=production bundle exec jekyll build
+
+# Legacy build helper
+bin/cibuild                          # runs bundle exec jekyll build --lsi
 ```
 
-CI (`deploy.yml`) also installs `pip3 install --upgrade jupyter` and `npm install -g mermaid.cli` before building. Deployment goes to the `gh-pages` branch via `JamesIves/github-pages-deploy-action@v4`.
+CI is defined in `.github/workflows/deploy.yml`. It runs on pushes and pull
+requests to `main`/`master`, uses Ruby 3.2.2 with Bundler cache, installs
+`jupyter` and `mermaid.cli`, builds with `JEKYLL_ENV=production`, and deploys
+`_site` via `JamesIves/github-pages-deploy-action@v4` except on pull requests.
+Treat `bin/deploy` as a legacy/manual deploy script because it performs branch
+switching and force-push style publication.
+
+### Local Preview Procedure
+
+When the user asks to compile/build and view the website locally, use the
+native Jekyll setup that has already been verified on this machine:
+
+```bash
+export PATH="/Users/weiguo/Library/Python/3.9/bin:/opt/homebrew/opt/ruby@3.2/bin:$PATH"
+JEKYLL_ENV=production bundle exec jekyll build
+bundle exec jekyll serve --lsi --host 127.0.0.1 --port 4000
+open "http://127.0.0.1:4000/"
+```
+
+Operational notes:
+
+- Ruby 3.2 is installed via Homebrew at `/opt/homebrew/opt/ruby@3.2/bin`.
+- Jupyter is installed in the user Python bin directory and must be on `PATH`
+  for `jekyll-jupyter-notebook`.
+- ImageMagick is installed via Homebrew and provides `convert` for responsive
+  WebP generation.
+- Run the production build first when validating changes; Sass deprecation
+  warnings from al-folio are expected and do not block preview.
+- Start `jekyll serve` as a long-running/background command, then open
+  `http://127.0.0.1:4000/`. Stop the server with Ctrl-C when done.
+- Put screenshots and other temporary inspection files under `tmp/`, which is
+  gitignored and periodically cleaned by the user.
 
 ## Architecture
 
-### Content authoring
+### Content Authoring
 
-- **Home page**: `_pages/about.md` — profile, announcements, selected publications
-- **Publications**: `_bibliography/papers.bib` (BibTeX, rendered by `jekyll-scholar`). The `selected: true` field marks papers shown on the home page. Custom fields (`abbr`, `arxiv`, `poster`, `slides`, `code`) are filtered from raw bib output by `_plugins/hideCustomBibtex.rb`
-- **News/announcements**: individual Markdown files in `_news/`
-- **Blog posts**: `_posts/` (currently empty), with archives enabled for year/tag/category
-- **CV data**: `_data/cv.yml` and `assets/json/resume.json` (JSON Resume schema)
-- **Coauthor links**: `_data/coauthors.yml` — maps coauthor names to homepage URLs for auto-linking in publication lists
+- Home page: `_pages/about.md`, rendered with `_layouts/about.html`.
+- Publications page: `_pages/publications.md`.
+- Publications data: `_bibliography/papers.bib`, rendered by `jekyll-scholar`
+  through `_layouts/bib.html`. `selected = {true}` marks featured papers.
+- News/announcements: `_news/*.md`, configured as the `news` collection.
+- Blog: `blog/index.html` plus archive layouts are configured; `_posts/` is
+  currently absent/empty.
+- CV/resume: `_data/cv.yml`, `assets/json/resume.json`, and `assets/cv/`.
+- Coauthor links: `_data/coauthors.yml`, used to auto-link names in publication
+  lists.
 
-### Theme & layout system
+### Theme And Layout System
 
-- `_layouts/` — 11 layouts; `default.html` is the base, `about.html` is the home page, `bib.html` renders individual bibliography entries
-- `_includes/` — 44 partials; JS dependencies are loaded via `_includes/scripts/`
-- `_sass/` — 6 SCSS files; `_themes.scss` handles light/dark mode, `_base.scss` is the main stylesheet
-- `_plugins/` — 4 custom Ruby plugins (details tag, external posts, file-exists check, bib keyword filter)
+- `_layouts/` contains 11 layouts, including `default.html`, `about.html`,
+  `bib.html`, `post.html`, `page.html`, `cv.html`, archive layouts, and
+  `distill.html`.
+- `_includes/` contains 45 partials, including script loaders, resume/CV
+  sections, repository cards, news, selected papers, and media embeds.
+- `_sass/` contains 6 SCSS partials. `assets/css/main.scss` imports variables,
+  themes, layout, base styles, Distill styles, and CV styles.
+- `_plugins/` contains 4 custom Ruby plugins: details tag support, external RSS
+  posts, a Liquid file-exists tag, and BibTeX custom-field hiding.
 
-### Key configuration
+### Configuration
 
-All site-wide settings live in `_config.yml`:
-- `scholar:` block configures bibliography (author highlighting with `last_name: [Guo]`, APA style, grouped by year descending)
-- `enable_math: true` — MathJax 3.2.0
-- `enable_darkmode: true` — light/dark toggle
-- `max_width: 800px`, fixed navbar and footer
-- `imagemagick:` — auto-generates responsive WebP images from `assets/img/`
+Most site-wide behavior lives in `_config.yml`:
 
-### Static assets
+- Identity and social metadata for Wei Guo.
+- Fixed navbar/footer with `max_width: 800px`.
+- `collections.news` and `collections.projects`.
+- Jekyll plugins including archives, diagrams, scholar, sitemap, imagemagick,
+  Jupyter notebook rendering, minifier, email protection, and pagination.
+- `scholar:` highlights `Wei Guo`, uses APA style, reads
+  `_bibliography/papers.bib`, and groups entries by year descending.
+- `filtered_bibtex_keywords` hides internal publication fields such as `abbr`,
+  `arxiv`, `code`, `poster`, `slides`, `preview`, and `selected`.
+- Optional features include MathJax 3.2.0, dark mode, masonry, medium zoom, and
+  a scroll progress bar.
+- `imagemagick:` generates responsive WebP images from `assets/img/` at 480,
+  800, and 1400 px widths.
 
-`assets/` contains CSS, JS, images, PDFs (papers/posters), and Jupyter notebooks. Images are auto-converted to responsive WebP at 480/800/1400px widths.
+### Static Assets
 
-## Adding a New Publication
+`assets/` holds styles, JavaScript, images, PDFs, JSON data, notebooks, CV
+sources, and Plotly assets. Publication PDFs, posters, and slides live under
+`assets/pdf/`; publication preview images should be placed under
+`assets/img/publication_preview/` when used by BibTeX entries.
 
-1. Add a BibTeX entry to `_bibliography/papers.bib`
-2. Use `abbr` for the venue badge, `arxiv` for arXiv link, `selected: true` to feature on homepage
-3. Optional fields: `pdf`, `html`, `code`, `poster`, `slides`, `preview` (thumbnail image filename in `assets/img/publication_preview/`)
-4. Coauthor auto-linking requires a matching entry in `_data/coauthors.yml`
+## Common Edits
 
-## Adding a News Item
+### Adding A New Publication
 
-Create a Markdown file in `_news/` (e.g., `announcement_8.md`) with front matter:
+1. Add a BibTeX entry to `_bibliography/papers.bib`.
+2. Use `abbr` for the venue badge and `selected = {true}` for homepage feature.
+3. Prefer existing optional fields when available: `pdf`, `html`, `code`,
+   `poster`, `slides`, `arxiv`, `preview`, and `website`.
+4. Put preview thumbnails in `assets/img/publication_preview/`.
+5. Add missing coauthor homepage mappings to `_data/coauthors.yml`.
+
+### Adding A News Item
+
+Create a Markdown file in `_news/`, for example `_news/announcement_3.md`:
+
 ```yaml
 ---
 layout: post
@@ -71,3 +143,21 @@ inline: true
 ---
 Your announcement text here.
 ```
+
+### Editing The Home Page
+
+Edit `_pages/about.md` for profile text, announcements placement, and selected
+publication display. Keep major layout changes in `_layouts/about.html` or the
+relevant `_includes/` partial instead of embedding complex HTML in Markdown.
+
+## Agent Notes
+
+- Keep this file concise and update it when build commands, content locations,
+  or agent entry points change.
+- Do not edit generated output in `_site`; change source files instead.
+- Preserve the al-folio structure unless a site-specific customization clearly
+  belongs in `_layouts/`, `_includes/`, `_sass/`, or `_plugins/`.
+- When adding publication metadata, prefer fields already supported by the
+  theme and `_plugins/hideCustomBibtex.rb` over inventing new ones.
+- Before changing deployment behavior, inspect `.github/workflows/deploy.yml`
+  and avoid relying on the legacy `bin/deploy` script unless explicitly asked.

@@ -16,3 +16,6 @@ vendor
 *.run.xml
 *.synctex.gz
 *.log
+*.fdb_latexmk
+*.fls
+tmp/

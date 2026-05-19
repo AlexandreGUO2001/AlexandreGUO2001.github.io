@@ -2,6 +2,42 @@
  * Styles for the base elements of the theme.
  ******************************************************************************/
 
+@font-face {
+  font-family: "Lora Figures";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("https://fonts.gstatic.com/s/lora/v37/0QI6MX1D_JOuGQbT0gvTJPa787weuyJG.ttf") format("truetype");
+  unicode-range: U+0025, U+002C, U+002E, U+0030-0039;
+}
+
+@font-face {
+  font-family: "Lora Figures";
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("https://fonts.gstatic.com/s/lora/v37/0QI6MX1D_JOuGQbT0gvTJPa787wsuyJG.ttf") format("truetype");
+  unicode-range: U+0025, U+002C, U+002E, U+0030-0039;
+}
+
+@font-face {
+  font-family: "Lora Figures";
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("https://fonts.gstatic.com/s/lora/v37/0QI6MX1D_JOuGQbT0gvTJPa787zAvCJG.ttf") format("truetype");
+  unicode-range: U+0025, U+002C, U+002E, U+0030-0039;
+}
+
+@font-face {
+  font-family: "Lora Figures";
+  font-style: normal;
+  font-weight: 700 800;
+  font-display: swap;
+  src: url("https://fonts.gstatic.com/s/lora/v37/0QI6MX1D_JOuGQbT0gvTJPa787z5vCJG.ttf") format("truetype");
+  unicode-range: U+0025, U+002C, U+002E, U+0030-0039;
+}
+
 // Typography
 
 p,
@@ -17,6 +53,12 @@ li,
 span,
 strong {
   color: var(--global-text-color);
+}
+
+strong,
+b {
+  color: var(--global-text-color);
+  font-weight: 800;
 }
 
 hr {
@@ -551,6 +593,15 @@ footer.sticky-bottom {
 .publications {
   margin-top: 2rem;
 
+  .publication-note {
+    margin-top: -0.5rem;
+    margin-bottom: 1.5rem;
+    color: var(--global-text-color-light);
+    font-size: 0.95rem;
+    font-style: italic;
+    text-align: center;
+  }
+
   h1 {
     color: var(--global-theme-color);
     font-size: 2rem;
@@ -568,12 +619,33 @@ footer.sticky-bottom {
   }
 
   h2.bibliography {
-    color: var(--global-divider-color);
-    border-top: 1px solid var(--global-divider-color);
-    padding-top: 1rem;
-    margin-top: 2rem;
-    margin-bottom: -2rem;
-    text-align: right;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.9rem;
+    margin: 2.5rem 0 1.15rem;
+    border: 0;
+    padding: 0;
+    color: var(--global-accent-color);
+    font-family: "Gelasio", Georgia, "Times New Roman", serif;
+    font-size: 1.35rem;
+    font-style: italic;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    text-align: center;
+  }
+
+  h2.bibliography::before,
+  h2.bibliography::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    max-width: 11rem;
+    background: linear-gradient(90deg, transparent, var(--global-divider-color));
+  }
+
+  h2.bibliography::after {
+    background: linear-gradient(90deg, var(--global-divider-color), transparent);
   }
 
   ol.bibliography {
@@ -746,6 +818,652 @@ code {
   background-color: var(--global-code-bg-color);
   border-radius: 3px;
   padding: 3px 3px;
+}
+
+// Expressive personal-site layer
+
+body {
+  background:
+    radial-gradient(circle at 8% 4%, var(--global-accent-color-soft), transparent 32rem),
+    radial-gradient(circle at 92% 10%, rgba(44, 138, 160, 0.16), transparent 28rem),
+    linear-gradient(180deg, var(--global-bg-color), var(--global-bg-color));
+  font-family: "Lora Figures", Georgia, "Times New Roman", serif;
+  letter-spacing: -0.005em;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(30, 79, 143, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(30, 79, 143, 0.035) 1px, transparent 1px);
+  background-size: 44px 44px;
+  mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.72), transparent 62%);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.navbar,
+.btn,
+.badge {
+  font-family: "Bricolage Grotesque", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  letter-spacing: -0.03em;
+}
+
+.navbar {
+  backdrop-filter: blur(18px);
+  background-color: color-mix(in srgb, var(--global-bg-color) 86%, transparent);
+}
+
+.post {
+  line-height: 1.72;
+}
+
+.post article h2 {
+  align-items: center;
+  display: flex;
+  font-size: 1.72rem;
+  gap: 0.75rem;
+  margin-top: 2.75rem;
+}
+
+.post article h2::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, var(--global-divider-color), transparent);
+}
+
+.post article h2 a {
+  color: var(--global-text-color);
+  text-decoration: none;
+}
+
+.about-section {
+  margin: 1.35rem 0 1.6rem;
+}
+
+.about-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin: 0 0 0.85rem;
+  color: var(--global-accent-color);
+  font-family: "Lora", Georgia, "Times New Roman", serif;
+  font-size: 1.32rem;
+  font-style: italic;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 1.15;
+  text-transform: none;
+}
+
+.about-kicker::before {
+  content: none;
+}
+
+.about-callout {
+  position: relative;
+  margin: 1.55rem 0;
+  padding: 1rem 1.15rem 1.05rem;
+  border: 1px solid var(--global-divider-color);
+  border-radius: 20px;
+  background:
+    linear-gradient(135deg, var(--global-accent-color-soft), transparent 72%),
+    var(--global-card-bg-color);
+}
+
+.about-callout p:last-child {
+  margin-bottom: 0;
+}
+
+.research-focus-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.85rem;
+  margin-top: 1rem;
+}
+
+.research-focus-card {
+  padding: 1rem;
+  border: 1px solid var(--global-divider-color);
+  border-radius: 20px;
+  background: var(--global-card-bg-color);
+  transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+}
+
+.research-focus-card:hover {
+  transform: translateY(-2px);
+  border-color: color-mix(in srgb, var(--global-theme-color) 42%, var(--global-divider-color));
+  box-shadow: 0 14px 34px color-mix(in srgb, var(--global-shadow-color) 56%, transparent);
+}
+
+.research-focus-card__label {
+  display: block;
+  margin-bottom: 0.45rem;
+  color: var(--global-theme-color);
+  font-family: "Bricolage Grotesque", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+}
+
+.research-focus-card p {
+  margin-bottom: 0;
+  color: var(--global-text-color-light);
+  font-size: 0.96rem;
+  line-height: 1.58;
+}
+
+.home-hero {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1.55fr) minmax(220px, 0.65fr);
+  gap: 2.25rem;
+  align-items: center;
+  margin: 1.25rem 0 2.75rem;
+  padding: 2.25rem;
+  overflow: hidden;
+  border: 1px solid var(--global-divider-color);
+  border-radius: 32px;
+  background:
+    linear-gradient(135deg, var(--global-surface-color), color-mix(in srgb, var(--global-surface-color) 66%, transparent)),
+    radial-gradient(circle at 88% 12%, var(--global-accent-color-soft), transparent 15rem);
+  box-shadow: 0 22px 70px var(--global-shadow-color);
+  isolation: isolate;
+}
+
+.home-hero::before {
+  content: "";
+  position: absolute;
+  width: 18rem;
+  height: 18rem;
+  right: -7rem;
+  top: -8rem;
+  border-radius: 999px;
+  background: radial-gradient(circle, color-mix(in srgb, var(--global-cyan-color) 32%, transparent), transparent 68%);
+  z-index: -1;
+}
+
+.home-hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.34);
+  pointer-events: none;
+}
+
+.news-timeline time {
+  font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+.home-hero__eyebrow {
+  margin-bottom: 0.95rem;
+  color: color-mix(in srgb, var(--global-accent-color) 72%, var(--global-text-color));
+  font-family: "Gelasio", Georgia, "Times New Roman", serif;
+  font-size: 1.03rem;
+  font-style: italic;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  text-transform: none;
+}
+
+.home-hero__title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.45rem 0.7rem;
+  margin-bottom: 0.25rem;
+  font-size: clamp(2rem, 4.6vw, 3.35rem);
+  line-height: 1.04;
+  color: var(--global-text-color);
+}
+
+.home-hero__name-en {
+  font-family: "Cormorant Upright", "Gelasio", Georgia, "Times New Roman", serif;
+  font-style: normal;
+  font-weight: 700;
+  letter-spacing: -0.035em;
+}
+
+.home-hero__name-zh {
+  font-family: "Kaiti SC", "STKaiti", "华文楷体", "KaiTi", "楷体", "Songti SC", "STSong", serif;
+  font-size: 0.98em;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.home-hero__subtitle {
+  max-width: 37rem;
+  margin-top: 0.85rem;
+  margin-bottom: 0;
+  color: #b10000;
+  font-family: "Gelasio", Georgia, "Times New Roman", serif;
+  font-size: clamp(0.96rem, 1.65vw, 1.1rem);
+  font-weight: 400;
+  letter-spacing: -0.018em;
+  line-height: 1.55;
+}
+
+.home-hero__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  margin: 1.25rem 0 1.6rem;
+}
+
+.home-hero__chips span {
+  border: 1px solid var(--global-divider-color);
+  border-radius: 999px;
+  padding: 0.44rem 0.78rem;
+  background: color-mix(in srgb, var(--global-surface-color-strong) 76%, transparent);
+  color: var(--global-text-color);
+  font-family: "Gelasio", Georgia, "Times New Roman", serif;
+  font-size: 0.86rem;
+  font-style: normal;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  transition: transform 180ms ease, border-color 180ms ease, background 180ms ease;
+}
+
+.home-hero__chips span:hover {
+  transform: translateY(-2px);
+  border-color: var(--global-accent-color);
+  background: var(--global-accent-color-soft);
+}
+
+.home-hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.7rem;
+}
+
+.home-hero__actions a {
+  border: 1px solid var(--global-divider-color);
+  border-radius: 999px;
+  padding: 0.65rem 0.9rem;
+  color: var(--global-text-color);
+  font-family: "Bricolage Grotesque", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  text-decoration: none;
+  transition: transform 180ms ease, color 180ms ease, border-color 180ms ease, background 180ms ease;
+}
+
+.home-hero__actions a:first-child {
+  border-color: #1e4f8f;
+  background: #1e4f8f;
+  color: var(--global-hover-text-color);
+}
+
+.home-hero__actions a:nth-child(2) {
+  border-color: color-mix(in srgb, var(--global-accent-color) 48%, var(--global-divider-color));
+  background: var(--global-accent-color-soft);
+  color: color-mix(in srgb, var(--global-accent-color) 78%, var(--global-text-color));
+}
+
+.home-hero__actions a:nth-child(3) {
+  border-color: color-mix(in srgb, var(--global-cyan-color) 54%, var(--global-divider-color));
+  background: color-mix(in srgb, var(--global-cyan-color) 16%, var(--global-surface-color-strong));
+  color: color-mix(in srgb, var(--global-cyan-color) 72%, var(--global-text-color));
+}
+
+.home-hero__actions a:hover {
+  transform: translateY(-2px);
+  border-color: var(--global-hover-color);
+  color: var(--global-hover-color);
+  text-decoration: none;
+}
+
+.home-hero__actions a:first-child:hover {
+  color: var(--global-hover-text-color);
+  background: var(--global-hover-color);
+}
+
+.home-hero__actions a:nth-child(2):hover {
+  border-color: var(--global-accent-color);
+  background: var(--global-accent-color);
+  color: var(--global-hover-text-color);
+}
+
+.home-hero__actions a:nth-child(3):hover {
+  border-color: var(--global-cyan-color);
+  background: var(--global-cyan-color);
+  color: var(--global-hover-text-color);
+}
+
+.home-hero__portrait {
+  justify-self: end;
+  position: relative;
+}
+
+.home-hero__portrait::before {
+  content: "";
+  position: absolute;
+  inset: 1.1rem -0.8rem -1rem 0.8rem;
+  border: 1px solid var(--global-accent-color);
+  border-radius: 28px;
+  opacity: 0.35;
+}
+
+.home-hero__portrait figure,
+.home-hero__portrait img {
+  position: relative;
+  width: min(250px, 100%);
+  max-width: 100%;
+  border-radius: 28px !important;
+}
+
+.home-hero__portrait img {
+  filter: saturate(0.92) contrast(1.04);
+}
+
+.news-timeline {
+  position: relative;
+  display: grid;
+  gap: 0.9rem;
+  overflow-y: auto;
+  padding-left: 1.1rem;
+}
+
+.news-timeline::before {
+  content: "";
+  position: absolute;
+  left: 0.25rem;
+  top: 0.4rem;
+  bottom: 0.4rem;
+  width: 1px;
+  background: linear-gradient(var(--global-theme-color), var(--global-divider-color));
+}
+
+.news-timeline__item {
+  position: relative;
+  display: grid;
+  grid-template-columns: 8.8rem minmax(0, 1fr);
+  gap: 1rem;
+  align-items: start;
+  padding: 0.95rem 1rem;
+  border: 1px solid var(--global-divider-color);
+  border-radius: 20px;
+  background: var(--global-card-bg-color);
+  box-shadow: 0 10px 28px color-mix(in srgb, var(--global-shadow-color) 55%, transparent);
+}
+
+.news-timeline__item::before {
+  content: "";
+  position: absolute;
+  left: -1.05rem;
+  top: 1.28rem;
+  width: 0.55rem;
+  height: 0.55rem;
+  border: 2px solid var(--global-bg-color);
+  border-radius: 999px;
+  background: var(--global-accent-color);
+  box-shadow: 0 0 0 4px var(--global-accent-color-soft);
+}
+
+.news-timeline time {
+  color: var(--global-accent-color);
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.news-timeline__content {
+  color: var(--global-text-color);
+}
+
+.news-timeline__content strong,
+.news-timeline__content b {
+  font-family: inherit;
+  font-weight: 800;
+  letter-spacing: 0;
+}
+
+.publications ol.bibliography li {
+  margin-bottom: 1.15rem;
+}
+
+.publications ol.bibliography li .publication-card {
+  align-items: stretch;
+  margin: 0;
+  padding: 1.1rem;
+  border: 1px solid var(--global-divider-color);
+  border-radius: 24px;
+  background: var(--global-card-bg-color);
+  box-shadow: 0 16px 42px color-mix(in srgb, var(--global-shadow-color) 60%, transparent);
+  transition: transform 220ms ease, border-color 220ms ease, box-shadow 220ms ease;
+}
+
+.publications ol.bibliography li .publication-card:hover {
+  transform: translateY(-3px);
+  border-color: color-mix(in srgb, var(--global-theme-color) 46%, var(--global-divider-color));
+  box-shadow: 0 24px 58px var(--global-shadow-color);
+}
+
+.publications ol.bibliography li .publication-card__media {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 6.25rem;
+  border-radius: 18px;
+  background:
+    linear-gradient(135deg, var(--global-accent-color-soft), transparent),
+    color-mix(in srgb, var(--global-surface-color-strong) 74%, transparent);
+}
+
+.publications ol.bibliography li .preview {
+  overflow: hidden;
+}
+
+.publications ol.bibliography li .preview img {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  object-fit: cover;
+  transition: transform 240ms ease;
+}
+
+.publications ol.bibliography li .publication-card:hover .preview img {
+  transform: scale(1.035);
+}
+
+.publications ol.bibliography li .abbr {
+  height: auto;
+  margin-bottom: 0;
+}
+
+.publications ol.bibliography li .abbr abbr {
+  border-radius: 999px;
+  border: 1px solid var(--global-badge-border-color);
+  background: var(--global-badge-bg-color);
+  color: var(--global-badge-text-color);
+  padding: 0.22rem 0.68rem;
+  font-family: "Bricolage Grotesque", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 1.08rem;
+  letter-spacing: -0.04em;
+}
+
+.publications ol.bibliography li .abbr abbr a {
+  color: var(--global-badge-text-color);
+}
+
+.publications ol.bibliography li .preview-abbr {
+  position: absolute;
+  left: 50%;
+  top: 0.75rem;
+  z-index: 1;
+  transform: translateX(-50%);
+}
+
+.publications ol.bibliography li .preview-abbr .badge {
+  border: 1px solid var(--global-badge-border-color);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--global-badge-bg-color) 82%, var(--global-surface-color-strong));
+  color: var(--global-badge-text-color);
+  padding: 0.22rem 0.68rem;
+  font-family: "Bricolage Grotesque", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 1.08rem;
+  letter-spacing: -0.04em;
+  box-shadow: 0 8px 22px color-mix(in srgb, var(--global-shadow-color) 60%, transparent);
+}
+
+.publications ol.bibliography li .preview-abbr .badge a {
+  color: var(--global-badge-text-color);
+}
+
+.publications ol.bibliography li .title {
+  font-family: "Bricolage Grotesque", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 1.08rem;
+  line-height: 1.25;
+  letter-spacing: -0.03em;
+}
+
+.publications ol.bibliography li .author {
+  color: var(--global-text-color-light);
+}
+
+.publications ol.bibliography li .periodical,
+.publications ol.bibliography li .periodical em {
+  color: var(--global-text-color);
+  font-family: "Lora Figures", Georgia, "Times New Roman", serif;
+}
+
+.publications ol.bibliography li .tldr {
+  margin-top: 0.55rem;
+  color: var(--global-text-color);
+  font-size: 0.94rem;
+  line-height: 1.45;
+}
+
+.publications ol.bibliography li .tldr span {
+  display: inline-flex;
+  align-items: center;
+  margin-right: 0.5rem;
+  border: 1px solid var(--global-badge-border-color);
+  border-radius: 999px;
+  padding: 0.08rem 0.42rem;
+  background: var(--global-badge-bg-color);
+  color: var(--global-badge-text-color);
+  font-family: "Bricolage Grotesque", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.publications ol.bibliography li .links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin-top: 0.6rem;
+}
+
+.publications ol.bibliography li .links a.btn {
+  margin-right: 0;
+  border-radius: 999px;
+  border-color: var(--global-divider-color);
+  background: color-mix(in srgb, var(--global-surface-color-strong) 52%, transparent);
+  font-family: "Bricolage Grotesque", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  text-transform: none;
+  transition: transform 160ms ease, border-color 160ms ease, color 160ms ease;
+}
+
+.publications ol.bibliography li .links a.btn:hover {
+  transform: translateY(-1px);
+  border-color: var(--global-accent-color);
+  color: var(--global-accent-color);
+  text-decoration: none;
+}
+
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.home-hero,
+.news-timeline__item,
+.publications ol.bibliography li {
+  animation: rise-in 520ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.news-timeline__item:nth-child(2),
+.publications ol.bibliography li:nth-child(2) {
+  animation-delay: 80ms;
+}
+
+.news-timeline__item:nth-child(3),
+.publications ol.bibliography li:nth-child(3) {
+  animation-delay: 150ms;
+}
+
+.news-timeline__item:nth-child(4),
+.publications ol.bibliography li:nth-child(4) {
+  animation-delay: 220ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-hero,
+  .news-timeline__item,
+  .publications ol.bibliography li,
+  .home-hero__chips span,
+  .home-hero__actions a,
+  .publications ol.bibliography li .publication-card {
+    animation: none;
+    transition: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .home-hero {
+    grid-template-columns: 1fr;
+    padding: 1.35rem;
+    border-radius: 24px;
+  }
+
+  .home-hero__portrait {
+    justify-self: start;
+    order: -1;
+  }
+
+  .home-hero__portrait figure,
+  .home-hero__portrait img {
+    width: 170px;
+  }
+
+  .news-timeline__item {
+    grid-template-columns: 1fr;
+    gap: 0.35rem;
+  }
+
+  .research-focus-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .publications ol.bibliography li .publication-card {
+    padding: 0.95rem;
+  }
+
+  .publications ol.bibliography li .publication-card__media {
+    margin-bottom: 0.9rem;
+  }
 }
 
 
