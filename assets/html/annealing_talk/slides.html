@@ -1,0 +1,2533 @@
+<!DOCTYPE html>
+<html lang="en" data-ui-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A Unified Complexity Analysis of Annealing</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.21/dist/katex.min.css" crossorigin="anonymous">
+<style>
+/* ─── codeck engine v2.0 ─── */
+/* Engine base styles. AI does not modify this file. */
+
+/* ─── Reset ─── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body {
+  width: 100%; height: 100%; overflow: hidden;
+  background: var(--bg, #111);
+  color: var(--fg, #eee);
+  font-family: var(--font-body, system-ui, -apple-system, sans-serif);
+}
+
+/* ─── Responsive baseline ─── */
+:root {
+  --slide-padding: clamp(1rem, 4vw, 4rem);
+  --content-gap: clamp(0.5rem, 2vw, 2rem);
+  --element-gap: clamp(0.25rem, 1vw, 1rem);
+  --title-size: clamp(1.5rem, 5vw, 4rem);
+  --h2-size: clamp(1.25rem, 3.5vw, 2.5rem);
+  --h3-size: clamp(1rem, 2.5vw, 1.75rem);
+  --body-size: clamp(0.75rem, 1.5vw, 1.125rem);
+  --small-size: clamp(0.65rem, 1vw, 0.875rem);
+}
+
+/* ─── FOUC protection ─── */
+#app {
+  position: relative;
+  width: 100%; height: 100%;
+  overflow: hidden;
+  transition: opacity 0.3s ease;
+}
+#app.ready { opacity: 1 !important; }
+
+/* ─── Slides ─── */
+.slide {
+  position: absolute;
+  inset: 0;
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  padding: var(--slide-padding);
+  overflow: hidden;
+}
+.slide.active { display: flex; }
+
+/* ─── Fragments ─── */
+[data-f] {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.4s ease, transform 0.4s ease, filter 0.4s ease;
+}
+[data-f-type="scale"] { transform: scale(0.92); }
+[data-f-type="blur"]  { transform: none; filter: blur(8px); }
+[data-f-type="slide"]  { transform: translateX(-24px); }
+[data-f].visible {
+  opacity: 1;
+  transform: none;
+  filter: none;
+}
+
+/* ═══════════════════════════════════════
+   Segmented progress bar
+   ═══════════════════════════════════════ */
+#progress {
+  position: fixed;
+  bottom: 0; left: 0;
+  width: 100%; height: 3px;
+  display: flex;
+  gap: 1px;
+  z-index: 100;
+}
+.progress-seg {
+  flex: 1;
+  background: var(--prog-track, rgba(255,255,255,0.1));
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+.progress-fill {
+  position: absolute;
+  top: 0; left: 0;
+  height: 100%;
+  background: var(--accent, #4af);
+  transition: width 0.3s ease;
+}
+
+/* ═══════════════════════════════════════
+   Slide toolbar (auto-hide on desktop)
+   ═══════════════════════════════════════ */
+#slide-toolbar {
+  --tb-bg: rgba(0,0,0,0.5);
+  --tb-color: rgba(255,255,255,0.7);
+  --tb-hover: #fff;
+  --tb-hover-bg: rgba(255,255,255,0.1);
+  --tb-dim: rgba(255,255,255,0.6);
+  --tb-tip-bg: rgba(0,0,0,0.85);
+  --tb-tip-color: #fff;
+
+  position: fixed;
+  bottom: 12px; left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 12px;
+  background: var(--tb-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: 999px;
+  z-index: 101;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+  user-select: none;
+}
+#slide-toolbar.tb-visible { opacity: 1; pointer-events: auto; }
+.tb-btn {
+  width: 36px; height: 36px;
+  display: flex; align-items: center; justify-content: center;
+  border: none; border-radius: 8px;
+  background: transparent;
+  color: var(--tb-color);
+  cursor: pointer;
+  padding: 0;
+  position: relative;
+  -webkit-tap-highlight-color: transparent;
+  transition: color 0.15s, background 0.15s;
+}
+.tb-btn:hover { color: var(--tb-hover); background: var(--tb-hover-bg); }
+.tb-btn svg { width: 20px; height: 20px; }
+/* Instant tooltip */
+.tb-btn[data-tip]::after {
+  content: attr(data-tip);
+  position: absolute;
+  bottom: calc(100% + 8px); left: 50%;
+  transform: translateX(-50%);
+  padding: 4px 10px;
+  background: var(--tb-tip-bg);
+  color: var(--tb-tip-color);
+  font-size: 12px;
+  white-space: nowrap;
+  border-radius: 6px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.12s;
+}
+.tb-btn[data-tip]:hover::after { opacity: 1; }
+.tb-counter {
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  color: var(--tb-dim);
+  min-width: 48px;
+  text-align: center;
+  padding: 0 4px;
+}
+@media (prefers-color-scheme: light) {
+  #slide-toolbar {
+    --tb-bg: rgba(255,255,255,0.7);
+    --tb-color: rgba(0,0,0,0.55);
+    --tb-hover: #111;
+    --tb-hover-bg: rgba(0,0,0,0.08);
+    --tb-dim: rgba(0,0,0,0.45);
+    --tb-tip-bg: rgba(0,0,0,0.75);
+    --tb-tip-color: #fff;
+  }
+  .progress-seg { --prog-track: rgba(0,0,0,0.1); }
+  .ov-cell { --ov-border: rgba(0,0,0,0.12); }
+  #ov-grid { --ov-bg: #f0f0f0; --ov-label-color: rgba(0,0,0,0.5); }
+}
+
+/* Mobile: always visible */
+@media (max-width: 768px) {
+  #slide-toolbar { opacity: 1 !important; pointer-events: auto !important; }
+  .slide { padding: 32px 24px; }
+}
+
+/* ═══════════════════════════════════════
+   Overview mode (clone-based grid)
+   ═══════════════════════════════════════ */
+#app.overview { overflow: hidden; }
+#app.overview #progress,
+#app.overview #slide-toolbar { display: none; }
+
+#ov-grid {
+  position: absolute; inset: 0;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  padding: 24px;
+  overflow-y: auto;
+  align-content: start;
+  z-index: 250; /* above presenter-grid (200) */
+  background: var(--ov-bg, #1a1a1a);
+}
+.ov-cell {
+  display: flex;
+  flex-direction: column;
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: pointer;
+  border: 2px solid var(--ov-border, rgba(255,255,255,0.1));
+  transition: border-color 0.2s, transform 0.2s;
+}
+.ov-cell:hover {
+  border-color: var(--accent, #4af);
+  transform: scale(1.03);
+}
+.ov-cell.ov-active {
+  border-color: var(--accent, #4af);
+}
+.ov-viewport {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16/9;
+  overflow: hidden;
+  background: var(--bg, #111);
+  flex-shrink: 0;
+}
+.ov-label {
+  padding: 4px 8px;
+  font-size: 11px;
+  line-height: 1.3;
+  color: var(--ov-label-color, rgba(255,255,255,0.5));
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-family: var(--font-body, system-ui, sans-serif);
+}
+
+@media (max-width: 768px) {
+  #ov-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 16px; }
+}
+
+/* ═══════════════════════════════════════
+   Print mode (?print) — for PDF/PPTX export
+   ═══════════════════════════════════════ */
+#app.print-mode {
+  overflow: visible;
+  height: auto;
+}
+#app.print-mode .slide {
+  position: relative;
+  inset: auto;
+  display: flex;
+  width: 1280px;
+  height: 720px;
+  page-break-after: always;
+  break-after: page;
+}
+#app.print-mode .slide:last-child {
+  page-break-after: auto;
+  break-after: auto;
+}
+/* Show all fragments in print */
+#app.print-mode [data-f] {
+  opacity: 1 !important;
+  transform: none !important;
+  filter: none !important;
+  transition: none !important;
+}
+#app.print-mode #progress,
+#app.print-mode #slide-toolbar,
+#app.print-mode #key-hints { display: none !important; }
+
+@page {
+  size: 1280px 720px;
+  margin: 0;
+}
+@media print {
+  html, body { width: 1280px; height: auto; overflow: visible; }
+  #app { overflow: visible; height: auto; }
+  .slide {
+    position: relative !important;
+    inset: auto !important;
+    display: flex !important;
+    width: 1280px !important;
+    height: 720px !important;
+    page-break-after: always;
+  }
+  [data-f] { opacity: 1 !important; transform: none !important; filter: none !important; }
+  #progress, #slide-toolbar, #key-hints { display: none !important; }
+}
+
+/* ═══════════════════════════════════════
+   Keyboard hints overlay
+   ═══════════════════════════════════════ */
+#key-hints {
+  position: fixed;
+  top: 16px; left: 50%;
+  transform: translateX(-50%);
+  padding: 8px 20px;
+  background: rgba(0,0,0,0.6);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-radius: 999px;
+  font-size: 12px;
+  color: rgba(255,255,255,0.7);
+  z-index: 102;
+  opacity: 1;
+  transition: opacity 1.5s ease 2s;
+  white-space: nowrap;
+}
+#key-hints.hints-fade { opacity: 0; }
+#key-hints kbd {
+  display: inline-block;
+  padding: 1px 5px;
+  border: 1px solid rgba(255,255,255,0.25);
+  border-radius: 3px;
+  font-family: inherit;
+  font-size: 11px;
+}
+
+/* ═══════════════════════════════════════
+   Presenter mode
+   ═══════════════════════════════════════ */
+#app.presenter-mode #progress:not(.pv-progress),
+#app.presenter-mode #slide-toolbar { display: none; }
+
+.presenter-grid {
+  --pv-bg: #1a1a1a;
+  --pv-surface: #222;
+  --pv-text: #ccc;
+  --pv-text-dim: rgba(255,255,255,0.5);
+  --pv-text-muted: rgba(255,255,255,0.6);
+  --pv-border: rgba(255,255,255,0.08);
+  --pv-btn-bg: rgba(255,255,255,0.06);
+  --pv-btn-hover: rgba(255,255,255,0.12);
+  --pv-btn-color: rgba(255,255,255,0.6);
+  --pv-btn-active: #fff;
+  --pv-tip-bg: rgba(0,0,0,0.85);
+
+  position: absolute; inset: 0;
+  display: grid;
+  grid-template-columns: 3fr 2fr;
+  grid-template-rows: 1fr auto auto;
+  grid-template-areas:
+    'main side'
+    'toolbar toolbar'
+    'pvprog pvprog';
+  gap: 0;
+  background: var(--pv-bg);
+  z-index: 200;
+}
+.pv-main {
+  grid-area: main;
+  padding: 12px 6px 12px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.pv-side {
+  grid-area: side;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  padding: 12px 12px 12px 6px;
+  min-height: 0;
+}
+.pv-next-wrap {
+  flex: 0 0 auto;
+}
+.pv-notes-wrap {
+  flex: 1 1 0;
+  overflow-y: auto;
+  min-height: 0;
+  background: var(--pv-surface);
+  border-radius: 6px;
+  margin-top: 8px;
+}
+
+/* Viewports */
+.pv-viewport {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16/9;
+  overflow: hidden;
+  background: var(--bg, #111);
+  border-radius: 6px;
+  border: 1px solid var(--pv-border);
+}
+.pv-next-wrap .pv-viewport {
+  opacity: 0.85;
+}
+.pv-empty {
+  display: flex; align-items: center; justify-content: center;
+  height: 100%; opacity: 0.3; font-size: 24px;
+}
+
+/* Notes */
+.pv-notes-body {
+  padding: 12px 16px;
+  font-size: 16px;
+  line-height: 1.65;
+  white-space: pre-wrap;
+  color: var(--pv-text);
+}
+.pv-notes-empty {
+  opacity: 0.35;
+  font-style: italic;
+}
+
+/* Presenter toolbar */
+.pv-toolbar {
+  grid-area: toolbar;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 8px 16px;
+  border-top: 1px solid var(--pv-border);
+}
+.pv-toolbar-group {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.pv-btn {
+  width: 32px; height: 32px;
+  display: flex; align-items: center; justify-content: center;
+  border: none; border-radius: 6px;
+  background: var(--pv-btn-bg);
+  color: var(--pv-btn-color);
+  cursor: pointer;
+  padding: 0;
+  position: relative;
+  transition: color 0.15s, background 0.15s;
+}
+.pv-btn:hover { color: var(--pv-btn-active); background: var(--pv-btn-hover); }
+.pv-btn[data-tip]::after {
+  content: attr(data-tip);
+  position: absolute;
+  bottom: calc(100% + 6px); left: 50%;
+  transform: translateX(-50%);
+  padding: 3px 8px;
+  background: var(--pv-tip-bg);
+  color: #fff;
+  font-size: 11px;
+  white-space: nowrap;
+  border-radius: 4px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.12s;
+}
+.pv-btn[data-tip]:hover::after { opacity: 1; }
+.pv-btn svg { width: 18px; height: 18px; }
+.pv-btn-sm { width: 28px; height: 28px; }
+.pv-btn-sm svg { width: 16px; height: 16px; }
+.pv-counter {
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  color: var(--pv-text-dim);
+  padding: 0 8px;
+}
+
+/* Timer */
+.pv-timer-group { margin-left: auto; }
+.pv-time {
+  font-size: 18px;
+  font-variant-numeric: tabular-nums;
+  font-family: var(--font-mono, ui-monospace, monospace);
+  color: var(--pv-text-muted);
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  user-select: none;
+  position: relative;
+  transition: color 0.15s;
+}
+.pv-time:hover { color: var(--pv-btn-active); }
+.pv-time[data-tip]::after {
+  content: attr(data-tip);
+  position: absolute;
+  bottom: calc(100% + 6px); left: 50%;
+  transform: translateX(-50%);
+  padding: 3px 8px;
+  background: var(--pv-tip-bg);
+  color: #fff;
+  font-size: 11px;
+  white-space: nowrap;
+  border-radius: 4px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.12s;
+}
+.pv-time[data-tip]:hover::after { opacity: 1; }
+
+/* Presenter progress bar */
+.pv-progress {
+  grid-area: pvprog;
+  position: relative !important;
+  bottom: auto !important;
+  left: auto !important;
+}
+
+/* ═══════════════════════════════════════
+   Presenter light theme
+   ═══════════════════════════════════════ */
+@media (prefers-color-scheme: light) {
+  .presenter-grid:not(.pv-dark) {
+    --pv-bg: #f0f0f0;
+    --pv-surface: #fff;
+    --pv-text: #333;
+    --pv-text-dim: rgba(0,0,0,0.45);
+    --pv-text-muted: rgba(0,0,0,0.5);
+    --pv-border: rgba(0,0,0,0.1);
+    --pv-btn-bg: rgba(0,0,0,0.05);
+    --pv-btn-hover: rgba(0,0,0,0.1);
+    --pv-btn-color: rgba(0,0,0,0.5);
+    --pv-btn-active: #111;
+    --pv-tip-bg: rgba(0,0,0,0.75);
+  }
+}
+.presenter-grid.pv-light {
+  --pv-bg: #f0f0f0;
+  --pv-surface: #fff;
+  --pv-text: #333;
+  --pv-text-dim: rgba(0,0,0,0.45);
+  --pv-text-muted: rgba(0,0,0,0.5);
+  --pv-border: rgba(0,0,0,0.1);
+  --pv-btn-bg: rgba(0,0,0,0.05);
+  --pv-btn-hover: rgba(0,0,0,0.1);
+  --pv-btn-color: rgba(0,0,0,0.5);
+  --pv-btn-active: #111;
+  --pv-tip-bg: rgba(0,0,0,0.75);
+}
+
+/* ═══════════════════════════════════════
+   Manual UI theme override (single source of truth)
+   html[data-ui-theme] overrides prefers-color-scheme
+   ═══════════════════════════════════════ */
+/* ─── Force light UI ─── */
+[data-ui-theme="light"] #slide-toolbar {
+  --tb-bg: rgba(255,255,255,0.7);
+  --tb-color: rgba(0,0,0,0.55);
+  --tb-hover: #111;
+  --tb-hover-bg: rgba(0,0,0,0.08);
+  --tb-dim: rgba(0,0,0,0.45);
+  --tb-tip-bg: rgba(0,0,0,0.75);
+  --tb-tip-color: #fff;
+}
+[data-ui-theme="light"] .progress-seg { --prog-track: rgba(0,0,0,0.1); }
+[data-ui-theme="light"] .ov-cell { --ov-border: rgba(0,0,0,0.12); }
+[data-ui-theme="light"] #ov-grid { --ov-bg: #f0f0f0; --ov-label-color: rgba(0,0,0,0.5); }
+[data-ui-theme="light"] .presenter-grid:not(.pv-dark) {
+  --pv-bg: #f0f0f0;
+  --pv-surface: #fff;
+  --pv-text: #333;
+  --pv-text-dim: rgba(0,0,0,0.45);
+  --pv-text-muted: rgba(0,0,0,0.5);
+  --pv-border: rgba(0,0,0,0.1);
+  --pv-btn-bg: rgba(0,0,0,0.05);
+  --pv-btn-hover: rgba(0,0,0,0.1);
+  --pv-btn-color: rgba(0,0,0,0.5);
+  --pv-btn-active: #111;
+  --pv-tip-bg: rgba(0,0,0,0.75);
+}
+
+/* ─── Force dark UI (overrides system light preference) ─── */
+[data-ui-theme="dark"] #slide-toolbar {
+  --tb-bg: rgba(0,0,0,0.5);
+  --tb-color: rgba(255,255,255,0.7);
+  --tb-hover: #fff;
+  --tb-hover-bg: rgba(255,255,255,0.1);
+  --tb-dim: rgba(255,255,255,0.6);
+  --tb-tip-bg: rgba(0,0,0,0.85);
+  --tb-tip-color: #fff;
+}
+[data-ui-theme="dark"] .progress-seg { --prog-track: rgba(255,255,255,0.1); }
+[data-ui-theme="dark"] .ov-cell { --ov-border: rgba(255,255,255,0.1); }
+[data-ui-theme="dark"] #ov-grid { --ov-bg: #1a1a1a; --ov-label-color: rgba(255,255,255,0.5); }
+[data-ui-theme="dark"] .presenter-grid {
+  --pv-bg: #1a1a1a;
+  --pv-surface: #222;
+  --pv-text: #ccc;
+  --pv-text-dim: rgba(255,255,255,0.5);
+  --pv-text-muted: rgba(255,255,255,0.6);
+  --pv-border: rgba(255,255,255,0.08);
+  --pv-btn-bg: rgba(255,255,255,0.06);
+  --pv-btn-hover: rgba(255,255,255,0.12);
+  --pv-btn-color: rgba(255,255,255,0.6);
+  --pv-btn-active: #fff;
+  --pv-tip-bg: rgba(0,0,0,0.85);
+}
+
+/* ─── Responsive breakpoints ─── */
+@media (max-height: 700px) {
+  :root {
+    --slide-padding: clamp(0.75rem, 3vw, 2rem);
+    --content-gap: clamp(0.4rem, 1.5vw, 1rem);
+    --title-size: clamp(1.25rem, 4.5vw, 2.5rem);
+    --h2-size: clamp(1rem, 3vw, 1.75rem);
+  }
+}
+@media (max-height: 600px) {
+  :root {
+    --slide-padding: clamp(0.5rem, 2.5vw, 1.5rem);
+    --content-gap: clamp(0.3rem, 1vw, 0.75rem);
+    --title-size: clamp(1.1rem, 4vw, 2rem);
+    --body-size: clamp(0.7rem, 1.2vw, 0.95rem);
+  }
+}
+@media (max-height: 500px) {
+  :root {
+    --slide-padding: clamp(0.4rem, 2vw, 1rem);
+    --title-size: clamp(1rem, 3.5vw, 1.5rem);
+    --h2-size: clamp(0.9rem, 2.5vw, 1.25rem);
+    --body-size: clamp(0.65rem, 1vw, 0.85rem);
+  }
+}
+
+/* ─── Accessibility ─── */
+@media (prefers-reduced-motion: reduce) {
+  [data-f] { transition: none; }
+  .progress-fill { transition: none; }
+  #app { transition: none; }
+  #slide-toolbar { transition: none; }
+}
+/* ====== 设计系统 + 页面样式 ====== */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+/* ═══════════════════════════════════════
+   Design System — Swiss Academic Grid
+   Müller-Brockmann isomorphic mapping
+   Canvas: 1280 × 720 px
+   ═══════════════════════════════════════ */
+
+:root {
+  /* ─── Color ─── */
+  --bg: #f8f7f4;
+  --fg: #1a1a1a;
+  --accent: #2563eb;
+  --accent2: #dc2626;
+  --primary: #1a1a1a;
+  --surface-card: #ffffff;
+  --surface-elevated: #f0efec;
+  --muted: #6b7280;
+  --border: #e5e3df;
+  --math-bg: #f3f2ef;
+  --highlight-bg: rgba(37, 99, 235, 0.06);
+  --result-bg: rgba(220, 38, 38, 0.05);
+
+  /* ─── Typography ─── */
+  --font-heading: 'Inter', system-ui, sans-serif;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+  --font-math: Georgia, 'Times New Roman', serif;
+
+  /* ─── Scale (ratio ~1.33) ─── */
+  --title-mega: 64px;
+  --title-large: 40px;
+  --title-medium: 30px;
+  --title-small: 24px;
+  --body: 20px;
+  --body-sm: 17px;
+  --caption: 14px;
+  --overline: 12px;
+
+  /* ─── Spacing ─── */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+  --space-2xl: 48px;
+  --space-3xl: 64px;
+  --slide-pad-x: 80px;
+  --slide-pad-y: 56px;
+
+  /* ─── Shape ─── */
+  --radius: 6px;
+  --radius-sm: 4px;
+  --radius-lg: 8px;
+
+  /* ─── Shadow ─── */
+  --shadow-low: 0 1px 3px rgba(0,0,0,0.06);
+  --shadow-md: 0 2px 8px rgba(0,0,0,0.08);
+
+  /* ─── Motion ─── */
+  --ease: cubic-bezier(0.4, 0, 0.2, 1);
+  --duration-micro: 150ms;
+  --duration-normal: 300ms;
+}
+
+/* ─── Paper grain texture ─── */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 9999;
+  mix-blend-mode: multiply;
+}
+
+/* ═══════════════════════════════════════
+   Typography Classes
+   ═══════════════════════════════════════ */
+
+.title-mega {
+  font-family: var(--font-heading);
+  font-size: var(--title-mega);
+  font-weight: 700;
+  line-height: 1.0;
+  letter-spacing: -0.03em;
+  color: var(--fg);
+}
+
+.title-large {
+  font-family: var(--font-heading);
+  font-size: var(--title-large);
+  font-weight: 600;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  color: var(--fg);
+}
+
+.title-medium {
+  font-family: var(--font-heading);
+  font-size: var(--title-medium);
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  color: var(--fg);
+}
+
+.title-small {
+  font-family: var(--font-heading);
+  font-size: var(--title-small);
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--fg);
+}
+
+.body-text {
+  font-family: var(--font-body);
+  font-size: var(--body);
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--fg);
+}
+
+.body-sm {
+  font-family: var(--font-body);
+  font-size: var(--body-sm);
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--fg);
+}
+
+.caption {
+  font-family: var(--font-body);
+  font-size: var(--caption);
+  font-weight: 500;
+  line-height: 1.4;
+  color: var(--muted);
+}
+
+.overline {
+  font-family: var(--font-body);
+  font-size: var(--overline);
+  font-weight: 600;
+  line-height: 1.4;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* ═══════════════════════════════════════
+   Math Typography (KaTeX)
+   ═══════════════════════════════════════ */
+
+/* Equation display blocks with accent border */
+.math-block {
+  padding: 16px 28px;
+  background: var(--math-bg);
+  border-left: 3px solid var(--accent);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  margin: 12px 0;
+  overflow-x: auto;
+}
+
+.math-block.key-result {
+  border-left-color: var(--accent2);
+  background: var(--result-bg);
+}
+
+/* KaTeX display math sizing */
+.math-block .katex-display {
+  margin: 0;
+}
+
+/* KaTeX inline sizing in body text */
+.katex { font-size: 1.05em !important; }
+
+/* KaTeX display sizing in math-blocks */
+.math-block .katex { font-size: 1.15em !important; }
+
+/* Algo blocks: slightly smaller KaTeX */
+.algo-block .katex { font-size: 0.95em !important; }
+
+/* ═══════════════════════════════════════
+   Layout Primitives
+   ═══════════════════════════════════════ */
+
+.grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-lg);
+  width: 100%;
+}
+
+.grid-3 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: var(--space-lg);
+  width: 100%;
+}
+
+.flex-col {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.flex-row {
+  display: flex;
+  flex-direction: row;
+  gap: var(--space-lg);
+  align-items: flex-start;
+}
+
+.card {
+  background: var(--surface-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--space-lg);
+}
+
+.card-accent {
+  background: var(--highlight-bg);
+  border: 1px solid rgba(37, 99, 235, 0.15);
+  border-radius: var(--radius);
+  padding: var(--space-lg);
+}
+
+.card-result {
+  background: var(--result-bg);
+  border: 1px solid rgba(220, 38, 38, 0.15);
+  border-radius: var(--radius);
+  padding: var(--space-lg);
+}
+
+/* ═══════════════════════════════════════
+   Slide Types
+   ═══════════════════════════════════════ */
+
+/* Base slide padding */
+.slide {
+  padding: var(--slide-pad-y) var(--slide-pad-x) !important;
+}
+
+/* Cover slide */
+.slide-cover {
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  background: var(--bg);
+}
+
+.slide-cover .title-mega {
+  max-width: 1000px;
+  margin-bottom: var(--space-lg);
+}
+
+.slide-cover .subtitle {
+  font-size: var(--body);
+  color: var(--muted);
+  margin-top: var(--space-sm);
+  line-height: 1.5;
+}
+
+.slide-cover .meta {
+  font-size: var(--caption);
+  color: var(--muted);
+  margin-top: var(--space-xl);
+  letter-spacing: 0.02em;
+}
+
+/* Section divider */
+.slide-divider {
+  justify-content: center;
+  align-items: flex-start;
+  background: var(--fg);
+  color: var(--bg);
+}
+
+.slide-divider .overline {
+  color: rgba(248, 247, 244, 0.5);
+}
+
+.slide-divider .title-large {
+  color: var(--bg);
+  max-width: 800px;
+}
+
+.slide-divider .body-text {
+  color: rgba(248, 247, 244, 0.7);
+  max-width: 700px;
+  margin-top: var(--space-md);
+}
+
+/* Content slide */
+.slide-content {
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: var(--space-lg);
+}
+
+.slide-content .title-large {
+  margin-bottom: var(--space-sm);
+}
+
+/* ═══════════════════════════════════════
+   Tables
+   ═══════════════════════════════════════ */
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--font-body);
+  font-size: var(--body-sm);
+  line-height: 1.4;
+}
+
+.data-table th {
+  text-align: left;
+  font-weight: 600;
+  font-size: var(--caption);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted);
+  padding: 8px 12px;
+  border-bottom: 2px solid var(--fg);
+  white-space: nowrap;
+}
+
+.data-table td {
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+.data-table tr:last-child td {
+  border-bottom: none;
+}
+
+.data-table .highlight-row td {
+  background: var(--highlight-bg);
+  font-weight: 600;
+}
+
+.data-table .result-row td {
+  background: var(--result-bg);
+  font-weight: 600;
+}
+
+.data-table .num {
+  font-variant-numeric: tabular-nums;
+  font-family: var(--font-mono);
+  font-size: 15px;
+}
+
+.data-table .best {
+  color: var(--accent2);
+  font-weight: 700;
+}
+
+/* Compact table variant */
+.data-table.compact td,
+.data-table.compact th {
+  padding: 5px 10px;
+  font-size: 15px;
+}
+
+.data-table.compact th {
+  font-size: 12px;
+}
+
+/* ═══════════════════════════════════════
+   Bullet Lists
+   ═══════════════════════════════════════ */
+
+.point-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.point-list li {
+  font-family: var(--font-body);
+  font-size: var(--body);
+  line-height: 1.5;
+  padding: 6px 0 6px 24px;
+  position: relative;
+  color: var(--fg);
+}
+
+.point-list li::before {
+  content: '—';
+  position: absolute;
+  left: 0;
+  color: var(--muted);
+}
+
+.point-list li.accent::before {
+  color: var(--accent);
+  content: '▸';
+}
+
+.point-list li.key::before {
+  color: var(--accent2);
+  content: '▸';
+}
+
+.point-list.compact li {
+  font-size: var(--body-sm);
+  padding: 4px 0 4px 20px;
+}
+
+/* ═══════════════════════════════════════
+   Proposition / Theorem Blocks
+   ═══════════════════════════════════════ */
+
+.prop-block {
+  background: var(--highlight-bg);
+  border-left: 3px solid var(--accent);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  padding: 16px 24px;
+  margin: 8px 0;
+}
+
+.prop-block .prop-label {
+  font-family: var(--font-heading);
+  font-size: var(--caption);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--accent);
+  margin-bottom: 6px;
+}
+
+.prop-block .prop-body {
+  font-family: var(--font-math);
+  font-style: italic;
+  font-size: 20px;
+  line-height: 1.6;
+  color: var(--fg);
+}
+
+.prop-block .prop-body .op {
+  font-style: normal;
+}
+
+/* ═══════════════════════════════════════
+   Metric Cards (for key numbers)
+   ═══════════════════════════════════════ */
+
+.metric {
+  text-align: center;
+  padding: var(--space-lg);
+}
+
+.metric-value {
+  font-family: var(--font-mono);
+  font-size: 48px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+.metric-value.accent { color: var(--accent); }
+.metric-value.result { color: var(--accent2); }
+
+.metric-label {
+  font-size: var(--caption);
+  font-weight: 500;
+  color: var(--muted);
+  margin-top: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* ═══════════════════════════════════════
+   Algorithm / Code Blocks
+   ═══════════════════════════════════════ */
+
+.algo-block {
+  background: var(--surface-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px 20px;
+  font-family: var(--font-mono);
+  font-size: 15px;
+  line-height: 1.6;
+  overflow-x: auto;
+}
+
+.algo-block .algo-title {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: var(--caption);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--accent);
+  margin-bottom: 8px;
+}
+
+.algo-block .keyword {
+  color: var(--accent);
+  font-weight: 500;
+}
+
+.algo-block .comment {
+  color: var(--muted);
+  font-style: italic;
+}
+
+/* ═══════════════════════════════════════
+   Comparison Blocks (side by side)
+   ═══════════════════════════════════════ */
+
+.vs-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2px;
+}
+
+.vs-block {
+  padding: 16px 20px;
+  border-radius: var(--radius);
+}
+
+.vs-block.bad {
+  background: rgba(220, 38, 38, 0.04);
+  border: 1px solid rgba(220, 38, 38, 0.12);
+}
+
+.vs-block.good {
+  background: rgba(37, 99, 235, 0.04);
+  border: 1px solid rgba(37, 99, 235, 0.12);
+}
+
+.vs-label {
+  font-size: var(--caption);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 8px;
+}
+
+.vs-block.bad .vs-label { color: var(--accent2); }
+.vs-block.good .vs-label { color: var(--accent); }
+
+/* ═══════════════════════════════════════
+   Inline Highlights
+   ═══════════════════════════════════════ */
+
+.hl { color: var(--accent); font-weight: 600; }
+.hl-red { color: var(--accent2); font-weight: 600; }
+.dim { color: var(--muted); }
+.mono { font-family: var(--font-mono); font-size: 0.9em; }
+
+/* ═══════════════════════════════════════
+   Roadmap / Steps
+   ═══════════════════════════════════════ */
+
+.roadmap {
+  display: flex;
+  gap: var(--space-md);
+  align-items: stretch;
+}
+
+.roadmap-step {
+  flex: 1;
+  background: var(--surface-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px 20px;
+  position: relative;
+}
+
+.roadmap-step.active {
+  border-color: var(--accent);
+  background: var(--highlight-bg);
+}
+
+.roadmap-step .step-num {
+  font-family: var(--font-mono);
+  font-size: var(--overline);
+  font-weight: 500;
+  color: var(--muted);
+  margin-bottom: 4px;
+}
+
+.roadmap-step.active .step-num {
+  color: var(--accent);
+}
+
+.roadmap-step .step-title {
+  font-family: var(--font-heading);
+  font-size: var(--body-sm);
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.roadmap-step .step-desc {
+  font-size: var(--caption);
+  color: var(--muted);
+  line-height: 1.4;
+}
+
+/* ═══════════════════════════════════════
+   Color temperature drift per section
+   ═══════════════════════════════════════ */
+
+/* Foundation slides: cool paper */
+.slide:nth-child(-n+8) { --bg: #f8f7f4; }
+
+/* Core theory: slightly warmer */
+.slide:nth-child(n+9):nth-child(-n+14) { --bg: #f9f7f2; }
+
+/* Results: warmest (peak) */
+.slide:nth-child(n+15):nth-child(-n+18) { --bg: #faf6ef; }
+
+/* Guidance + end: settle */
+.slide:nth-child(n+19) { --bg: #f7f6f3; }
+
+/* Section dividers keep their dark bg */
+.slide-divider { --bg: var(--fg); }
+
+/* ═══════════════════════════════════════
+   Talk theme overrides (annealing)
+   accent = blue (Sampling), accent2 = orange (Normalizing constant)
+   ═══════════════════════════════════════ */
+:root {
+  --accent2: #c2691c;
+  --result-bg: rgba(194, 105, 28, 0.06);
+  /* slightly larger body / overline / caption (titles unchanged) */
+  --body: 23px;
+  --body-sm: 20px;
+  --caption: 16.5px;
+  --overline: 13.5px;
+  /* trim vertical padding to offset the larger text on full slides */
+  --slide-pad-y: 46px;
+}
+/* one consistent paper background across all slides */
+.slide { --bg: #f8f7f4 !important; }
+
+/* full-citation footnotes: small enough to fit author + title */
+.footref {
+  font-family: var(--font-body);
+  font-size: 12.5px;
+  line-height: 1.4;
+  color: var(--muted);
+}
+.footref b { font-weight: 600; color: var(--fg); opacity: 0.85; }
+
+/* two-task rail columns */
+.rail-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; width: 100%; }
+.rail-col { padding: 14px 20px; border-radius: var(--radius); }
+.rail-col.samp { background: rgba(37, 99, 235, 0.05); border: 1px solid rgba(37, 99, 235, 0.16); }
+.rail-col.nc { background: rgba(194, 105, 28, 0.06); border: 1px solid rgba(194, 105, 28, 0.18); }
+.rail-col .rail-label {
+  font-size: var(--caption); font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.05em; margin-bottom: 8px;
+}
+.rail-col.samp .rail-label { color: var(--accent); }
+.rail-col.nc .rail-label { color: var(--accent2); }
+.hl-samp { color: var(--accent); font-weight: 600; }
+.hl-nc { color: var(--accent2); font-weight: 600; }
+
+/* ═══════════════════════════════════════
+   Slide Page Numbers (CSS counter)
+   ═══════════════════════════════════════ */
+
+/* Page numbers injected by JS — see post-assembly script */
+.page-num {
+  position: absolute;
+  bottom: 14px;
+  right: 24px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+  opacity: 0.6;
+  pointer-events: none;
+  z-index: 10;
+}
+.slide-divider .page-num {
+  color: rgba(248, 247, 244, 0.35);
+}
+
+/* ═══════════════════════════════════════
+   Image Click-to-Zoom
+   ═══════════════════════════════════════ */
+
+.zoomable {
+  cursor: zoom-in;
+  transition: opacity 0.15s;
+}
+.zoomable:hover { opacity: 0.9; }
+
+/* Full-screen overlay */
+.img-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  background: rgba(0, 0, 0, 0.85);
+  cursor: zoom-out;
+  justify-content: center;
+  align-items: center;
+  padding: 40px;
+}
+.img-overlay.active { display: flex; }
+.img-overlay img {
+  max-width: 95%;
+  max-height: 95%;
+  border-radius: 8px;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.5);
+  background: #ffffff;
+  padding: 16px;
+}
+
+/* ═══════════════════════════════════════
+   Fragment transitions override
+   ═══════════════════════════════════════ */
+
+@media (prefers-reduced-motion: no-preference) {
+  [data-f] {
+    transition: opacity var(--duration-normal) var(--ease),
+                transform var(--duration-normal) var(--ease),
+                filter var(--duration-normal) var(--ease);
+  }
+}
+
+/* ═══════════════════════════════════════
+   UI theme: force light for warm bg
+   ═══════════════════════════════════════ */
+</style>
+</head>
+<body>
+<div id="app" style="opacity:0">
+<!-- ====== 1. Cover ====== -->
+<section class="slide slide-cover" data-notes="Open by promising a unification: two familiar tasks, one governing quantity (the action). Audience knows the problems, not necessarily the OT / Girsanov tools.">
+  <h1 class="title-mega" style="font-size: 56px; max-width: 1060px; color: #1e3a8a;">A Unified Framework for the Complexity of Annealing</h1>
+  <p style="font-family: var(--font-heading); font-weight: 600; font-size: 30px; line-height: 1.2; color: #1e3a8a; margin-top: 16px;">Sampling &amp; Normalizing-Constant Estimation</p>
+  <!-- <p class="body-text" style="color: var(--muted); font-style: italic; margin-top: 22px; max-width: 820px;">Drawing samples and estimating the normalizing constant look like two problems &mdash; I'll argue they're one, and the same number tells you how hard both are.</p> -->
+  <p style="font-family: var(--font-body); font-size: 21px; font-weight: 500; margin-top: 32px; color: var(--fg);">Wei Guo &nbsp;&middot;&nbsp; joint work with Molei Tao &amp; Yongxin Chen </p>
+  <p style="font-family: var(--font-body); font-size: 21px; font-weight: 500; margin-top: 32px; color: var(--fg);">Georgia Institute of Technology</p>
+</section>
+
+<!-- ====== 2. Two tasks ====== -->
+<section class="slide slide-content" data-notes="Plant the visual: same density, two arrows. The left/right rail (blue = sampling, orange = normalizing constant) persists for most of the talk.">
+  <h2 class="title-large">Two tasks</h2>
+  <p class="body-text" data-f="1">Given an unnormalized probability density function &nbsp;$\pi \propto \hat\pi := \mathrm{e}^{-V}$&nbsp; on $\mathbb{R}^{d}$:</p>
+  <div class="rail-cols" data-f="2" style="margin-top: 6px;">
+    <div class="rail-col samp">
+      <div class="rail-label">Sampling</div>
+      <p class="body-text">Draw &nbsp;$X \sim \pi$.</p>
+    </div>
+    <div class="rail-col nc">
+      <div class="rail-label">Normalizing constant estimation</div>
+      <p class="body-text">Estimate &nbsp;$Z = \int_{\mathbb{R}^d} \mathrm{e}^{-V(x)}\,\mathrm{d}x$, &nbsp; or equivalently, the free energy $F = -\log Z$.</p>
+    </div>
+  </div>
+  <div class="flex-row" data-f="3" style="margin-top: 14px; align-items: center; gap: 28px;">
+    <img src="figs/two_tasks.png" alt="two tasks" class="zoomable" style="flex: 0 0 460px; max-height: 190px; border-radius: 6px;">
+    <p class="body-text" style="flex: 1; color: var(--muted);">Applications: Bayesian posteriors &amp; evidence; the partition function / free energy in statistical mechanics; energy-based &amp; latent-variable models; volume of convex bodies.</p>
+  </div>
+  <p class="body-text" data-f="4" style="text-align: center; margin-top: 12px; font-style: italic;">They look like two problems &mdash; I'll argue they're <span class="hl">closely related</span>, and the <span class="hl">same number</span> tells you how hard both are.</p>
+</section>
+
+<!-- ====== 2a. Where these show up ====== -->
+<section class="slide slide-content">
+  <p class="overline">Why we care</p>
+  <h2 class="title-large">Where these show up</h2>
+  <p class="body-text" data-f="1">The same $\pi\propto\mathrm{e}^{-V}$ shows up across domains:</p>
+  <div class="grid-2" style="margin-top: 8px; align-items: start; gap: 24px;">
+    <div class="card" data-f="2">
+      <p class="body-sm" style="font-weight: 700; margin-bottom: 6px;">Statistical mechanics / molecular dynamics</p>
+      <img src="figs/energy.jpg" alt="Boltzmann distribution and molecular energies" class="zoomable" style="width: 100%; max-height: 230px; object-fit: contain; background: #fff; border-radius: 4px;">
+      <p class="caption" style="margin-top: 4px;"><span class="dim">(Figure: Guan-Horng Liu's talk on ASBS.)</span></p>
+    </div>
+    <div class="card" data-f="3">
+      <p class="body-sm" style="font-weight: 700; margin-bottom: 6px;">Bayesian inference</p>
+      <img src="figs/bayes.png" alt="prior, likelihood and posterior densities" class="zoomable" style="width: 100%; max-height: 150px; object-fit: contain; margin-bottom: 4px;">
+      <div class="math-block" style="background: transparent; border: none; padding: 2px 0; text-align: center;">
+        $$p(\theta\mid\mathcal{D}) = \frac{p(\mathcal{D}\mid\theta)\,p(\theta)}{p(\mathcal{D})}, \quad p(\mathcal{D}) = \int p(\mathcal{D}\mid\theta)\,p(\theta)\,\mathrm{d}\theta.$$
+      </div>
+      <p class="caption">unnormalized = likelihood $\times$ prior; &nbsp; $Z=p(\mathcal{D})$ = <span class="hl-nc">evidence</span> (marginal likelihood).</p>
+    </div>
+  </div>
+  <p class="body-text" data-f="4" style="text-align: center; margin-top: 12px;">Sampling $\leftrightarrow$ configurations / posterior samples; &nbsp; normalizing constant $\leftrightarrow$ free energy / model evidence.</p>
+</section>
+
+<!-- ====== 2b. The classical recipes ====== -->
+<section class="slide slide-content">
+  <p class="overline">Background</p>
+  <h2 class="title-large">The classical recipes</h2>
+  <p class="body-text" data-f="1">Each task has a classical approach:</p>
+  <div class="rail-cols" style="margin-top: 6px;">
+    <div class="rail-col samp" data-f="2">
+      <div class="rail-label">Sampling &mdash; MCMC</div>
+      <p class="body-sm">Build a Markov chain whose stationary law is $\pi$ (Metropolis&ndash;Hastings, Gibbs, Langevin, &hellip;) and run the chain till convergence.</p>
+      <img src="figs/mcmc.png" alt="a Markov chain exploring a multimodal density" class="zoomable" style="width: 100%; max-height: 220px; object-fit: contain; margin-top: 6px;">
+    </div>
+    <div class="rail-col nc" data-f="3">
+      <div class="rail-label">Normalizing constant &mdash; Importance sampling</div>
+      <p class="body-sm">With a tractable proposal $\pi_0$: &nbsp; $Z = \mathbb{E}_{\pi_0}\!\left[\frac{\hat\pi}{\pi_0}\right] \approx \frac1n\sum_{i=1}^n \frac{\hat\pi(X_i)}{\pi_0(X_i)}$, &nbsp; $X_i\sim\pi_0$.</p>
+      <img src="figs/importance_sampling.png" alt="importance sampling: proposal versus target with weighted samples" class="zoomable" style="width: 100%; max-height: 220px; object-fit: contain; margin-top: 6px;">
+    </div>
+  </div>
+  <p class="body-text" data-f="4" style="text-align: center; margin-top: 12px;">Clean and provably efficient when $\pi$ is well-conditioned, or close to $\pi_0$.</p>
+</section>
+
+<!-- ====== 3. Why it's hard ====== -->
+<section class="slide slide-content" data-notes="Shared culprit = multimodality; shared cure = annealing, coming next.">
+  <h2 class="title-large">Why it's hard in practice</h2>
+  <div class="flex-row" style="flex: 1; align-items: center; gap: 28px;">
+    <div class="flex-col" style="flex: 1; gap: 12px;">
+      <div class="rail-cols" data-f="1">
+        <div class="rail-col samp">
+          <div class="rail-label">Sampling</div>
+          <p class="body-sm">Plain Langevin / MCMC gets <span class="hl">trapped in one mode</span> $\Rightarrow$ mixing time exponential in mode distance / dimension.</p>
+        </div>
+        <div class="rail-col nc">
+          <div class="rail-label">Normalizing constant</div>
+          <p class="body-sm">Naive importance sampling has <span class="hl-nc">high variance</span> from proposal&ndash;target mismatch.</p>
+        </div>
+      </div>
+      <p class="caption" data-f="2">High dimension + multimodality is the shared difficulty.</p>
+    </div>
+    <div style="flex: 0 0 430px;" data-f="3">
+      <img src="figs/multimodal_hard.png" alt="multimodal landscape, trapped sampler" class="zoomable" style="width: 100%; border-radius: 6px;">
+    </div>
+  </div>
+</section>
+
+<!-- ====== 4. Annealing ====== -->
+<section class="slide slide-content" data-notes="The red convolution curve foreshadows the OU-type curve in Part 4.">
+  <h2 class="title-large">Annealing: a smooth interpolation between distributions</h2>
+  <div class="flex-row" style="flex: 1; align-items: flex-start; gap: 28px;">
+    <div class="flex-col" style="flex: 1; gap: 10px;">
+      <p class="body-text" data-f="1">Bridge $\pi_0 \to \pi$ with a curve of distributions</p>
+      <div class="math-block" data-f="1" style="margin: 0;">
+        $$\Big(\pi_\theta = \frac{1}{Z_\theta}\mathrm{e}^{-V_\theta}\Big)_{\theta\in[0,1]}, \quad \pi_0 \text{ easy}, \;\; \pi_1 = \pi \text{ target}.$$
+      </div>
+      <p class="body-text" data-f="2">Two common choices:</p>
+      <ul class="point-list compact" data-f="2">
+        <li><span class="hl">Geometric:</span> &nbsp; $\pi_\theta \propto \exp\!\big(-V - \frac{\lambda(\theta)}{2}\|\cdot\|^2\big)$.</li>
+        <li><span class="hl-nc">Gaussian convolution:</span> &nbsp; $\pi_\theta = \pi * \mathcal{N}\!\big(0,\sigma(\theta)^2 I\big)$.</li>
+      </ul>
+    </div>
+    <div style="flex: 0 0 560px;" data-f="3">
+      <img src="figs/demo.png" alt="two annealing curves" class="zoomable" style="width: 100%; border-radius: 6px; border: 1px solid var(--border);">
+    </div>
+  </div>
+  <p class="body-text" data-f="4" style="text-align: center; margin-top: 12px; font-weight: 600;">Replace <span class="hl-nc">one hard jump</span> with <span class="hl">many easy steps</span> &mdash; break the hard problem down along the curve.</p>
+</section>
+
+<!-- ====== 5. Langevin in one slide ====== -->
+<section class="slide slide-content" data-notes="Audience knows this; keep it to one minute. The point is to set notation for the moving-target version next.">
+  <p class="overline">Prerequisite</p>
+  <h2 class="title-large">Langevin diffusion (LD) and Langevin Monte Carlo (LMC)</h2>
+  <div class="flex-col" style="gap: 10px; flex: 1;">
+    <div class="math-block" data-f="1" style="margin: 4px 0;">
+      <span class="hl">Langevin diffusion (LD):</span> &nbsp; $\mathrm{d}X_t = -\nabla V(X_t)\,\mathrm{d}t + \sqrt{2}\,\mathrm{d}B_t$, &nbsp; stationary distribution $\pi\propto\mathrm{e}^{-V}$.
+    </div>
+    <div class="math-block" data-f="2" style="margin: 4px 0;">
+      <span class="hl">Langevin Monte Carlo (LMC):</span> &nbsp; $X_{(k+1)h} = X_{kh} - h\,\nabla V(X_{kh}) + \sqrt{2h}\,\mathcal{N}(0,I)$ &nbsp; (Euler&ndash;Maruyama).
+    </div>
+    <ul class="point-list" data-f="3">
+      <li>Fast under log-concavity / isoperimetry (e.g., log-Sobolev or Poincaré); but <span class="hl-nc">slow</span> when $\pi$ is multimodal.</li>
+      <!-- <li class="accent">The building block; annealing wraps a <em>moving target</em> around it.</li> -->
+    </ul>
+  </div>
+  <p class="footref" data-f="3" style="margin-top: 6px;"><b>Vempala &amp; Wibisono (2019).</b> <i>Rapid Convergence of the Unadjusted Langevin Algorithm: Isoperimetry Suffices.</i> NeurIPS.</p>
+</section>
+
+<!-- ====== 6. ALD ====== -->
+<section class="slide slide-content" data-notes="Stress: the only difference from vanilla LD is that the target slides along the curve as time advances.">
+  <p class="overline" style="color: var(--accent);">Algorithm &middot; left rail (sampling)</p>
+  <h2 class="title-large">Annealed Langevin diffusion (ALD)</h2>
+  <div class="flex-col" style="gap: 14px; flex: 1; justify-content: center;">
+    <p class="body-text" data-f="1">Run Langevin with a <span class="hl">moving target</span> &mdash; Annealed Langevin Diffusion (ALD):</p>
+    <div class="math-block" data-f="1" style="margin: 0;">
+      $$\mathrm{d}X_t = \nabla\log\tilde\pi_t(X_t)\,\mathrm{d}t + \sqrt{2}\,\mathrm{d}B_t, \qquad \tilde\pi_t := \pi_{t/T},\qquad t\in[0,T].$$
+    </div>
+    <ul class="point-list" data-f="2">
+      <li>Write its <span class="hl">path measure</span>, i.e., the law of the whole trajectory, as $\mathbb{P}^{\rightarrow}$.</li>
+      <li class="accent" data-f="3">Discretize (one step per intermediate distribution) $\Rightarrow$ <span class="hl">Annealed Langevin Monte Carlo (ALMC)</span>.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ====== 7. Jarzynski ====== -->
+<section class="slide slide-content" data-notes="JE is the Z-side analogue of running ALD: same dynamics, but you also accumulate work along the path.">
+  <p class="overline" style="color: var(--accent2);">Algorithm &middot; right rail (normalizing constant)</p>
+  <h2 class="title-large">Jarzynski equality (JE)</h2>
+  <div class="flex-col" style="gap: 12px; flex: 1; justify-content: center;">
+    <p class="body-text" data-f="1">A non-equilibrium identity from statistical mechanics. Along ALD, define the <span class="hl-nc">work functional</span></p>
+    <div class="math-block" data-f="1" style="margin: 0;">
+      $$W(X) = \frac1T\int_0^T \partial_\theta V_\theta\big|_{\theta=t/T}(X_t)\,\mathrm{d}t.$$
+    </div>
+    <div class="math-block key-result" data-f="2" style="margin: 0;">
+      $$\mathbb{E}_{\mathbb{P}^{\rightarrow}}\,\mathrm{e}^{-W} = \mathrm{e}^{-\Delta F}, \qquad \Delta F = -\log\frac{Z_1}{Z_0}.$$
+    </div>
+    <ul class="point-list compact" data-f="3">
+      <li class="key">Unbiased estimator $\hat Z = Z_0\,\mathrm{e}^{-W(X)}$ of $Z = Z_0\,\mathrm{e}^{-\Delta F}$.</li>
+    </ul>
+    <ul class="point-list compact" data-f="3">
+      <li>Corollary: Second law of thermodynamics: $\mathbb{E}_{\mathbb{P}^{\rightarrow}}W \ge \Delta F$.</li>
+    </ul>
+    <p class="footref" data-f="3" style="margin-top: 6px;"><b>Jarzynski (1997).</b> <i>Nonequilibrium equality for free energy differences.</i> PRL.</p>
+  </div>
+</section>
+
+<!-- ====== 8. AIS ====== -->
+<section class="slide slide-content" data-notes="The mantra to keep the two rails synchronized: a continuous object and its discretization, mirrored across tasks.">
+  <p class="overline" style="color: var(--accent2);">Algorithm &middot; right rail (normalizing constant)</p>
+  <h2 class="title-large">Annealed Importance Sampling (AIS): discretized JE</h2>
+  <div class="flex-col" style="gap: 10px; flex: 1; justify-content: center;">
+    <ul class="point-list compact" data-f="1">
+      <li><span class="hl-nc">Annealed Importance Sampling</span> (Neal &rsquo;01): distributions $\pi_\ell = \frac{1}{Z_\ell}f_\ell$, $\ell\in\{0,\dots,M\}$, and kernels $F_\ell$ that leave $\pi_\ell$ invariant. Forward path measure:</li>
+    </ul>
+    <div class="math-block" data-f="1" style="margin: 0;">
+      $$\mathbb{P}^{\rightarrow}(x_{0:M}) = \pi_0(x_0)\prod_{\ell=1}^{M} F_\ell(x_{\ell-1}, x_\ell).$$
+    </div>
+    <div class="math-block key-result" data-f="2" style="margin: 0;">
+      $$\mathbb{E}_{\mathbb{P}^{\rightarrow}}\,\mathrm{e}^{-W} = \mathrm{e}^{-\Delta F}, \quad W(x_{0:M}) = \log\prod_{\ell=0}^{M-1}\frac{f_\ell(x_\ell)}{f_{\ell+1}(x_\ell)}, \quad \Delta F = -\log\frac{Z_M}{Z_0}.$$
+    </div>
+    <div class="card-accent" data-f="3" style="text-align: center;">
+      <p class="title-small"><span class="hl">ALD</span> : <span class="hl">ALMC</span> &nbsp;::&nbsp; <span class="hl-nc">JE</span> : <span class="hl-nc">AIS</span></p>
+      <p class="caption" style="margin-top: 4px;">continuous $\leftrightarrow$ discrete, mirrored on each task</p>
+    </div>
+    <p class="footref" data-f="3" style="margin-top: 4px;"><b>Neal (2001).</b> <i>Annealed importance sampling.</i> Statistics and Computing.</p>
+  </div>
+</section>
+
+<!-- ====== 9. The gap ====== -->
+<section class="slide slide-content" data-notes="Frame the contribution as the first non-asymptotic, isoperimetry-free analysis of both tasks.">
+  <p class="overline">The question</p>
+  <h2 class="title-large">The gap we close</h2>
+  <ul class="point-list" data-f="1" style="flex: 0;">
+    <li>These methods are <span class="hl">very commonly used</span> across many domains&hellip;</li>
+    <li data-f="2">&hellip;but very few <span class="hl-nc">non-asymptotic</span> complexity guarantees. Existing analyses are either:</li>
+  </ul>
+  <ul class="point-list compact" data-f="3" style="margin-left: 28px; flex: 1;">
+    <li>asymptotic in the number of particles;</li>
+    <li>restricted to a simple (e.g. Gaussian) work distribution; or</li>
+    <li>rely on <span class="hl-nc">isoperimetry / log-concavity</span> of the target.</li>
+  </ul>
+  <div class="card-accent" data-f="4">
+    <p class="body-text" style="font-weight: 600;">Question: how many oracle calls to $(V,\nabla V)$, with <span class="hl">weak assumption</span> on $\pi$?</p>
+  </div>
+  <p class="footref" data-f="4" style="margin-top: 10px;">
+    Gelman &amp; Meng (1998), <i>Simulating normalizing constants: from importance sampling to bridge sampling to path sampling</i>; Brosse, Durmus &amp; Moulines (2018), <i>Normalizing constants of log-concave densities</i>; Ge, Lee &amp; Lu (2020), <i>Estimating Normalizing Constants for Log-Concave Distributions: Algorithms and Lower Bounds</i>.
+  </p>
+</section>
+
+<!-- ====== 10. OT tool ====== -->
+<section class="slide slide-content" data-notes="This is the unfamiliar tool for the audience — go slow, lean on the 'speed of a curve of distributions' intuition.">
+  <p class="overline">The toolkit</p>
+  <h2 class="title-large">Optimal transport</h2>
+  <div class="flex-row" style="flex: 1; align-items: center; gap: 28px;">
+    <div class="flex-col" style="flex: 1; gap: 12px;">
+      <ul class="point-list" data-f="2">
+        <li>Curve &ldquo;speed&rdquo; = <span class="hl">Wasserstein-2 metric derivative</span> &nbsp; $|\dot\rho|_t := \lim_{\delta\to0}\frac{W_2(\rho_{t+\delta},\rho_t)}{|\delta|}$.</li>
+        <li data-f="3"><span class="hl">Continuity equation:</span> a vector field $(v_t)$ <em>generates</em> $(\rho_t)$ iff $\partial_t\rho_t + \nabla\!\cdot(\rho_t v_t)=0$. Equivalently, if $\dot X_t = v_t(X_t)$ and $X_0 \sim \rho_0$, then $X_t \sim \rho_t$.</li>
+      </ul>
+      <div class="prop-block" data-f="4">
+        <div class="prop-label">Key lemma</div>
+        <div class="prop-body" style="font-style: normal; font-size: 16px;">For an absolutely continuous curve $(\rho_t)$, any vector field $(v_t)$ that generates it satisfies $|\dot\rho|_t \le \|v_t\|_{L^2(\rho_t)}$ for every $t$. Moreover, there is a unique generating field $(v^*_t)$ that reaches equality for every $t$, given by $v^*_t = \lim_{\delta\to0}\frac{T_{\rho_t\to\rho_{t+\delta}} - \mathrm{id}}{\delta}$, where $T_{\mu\to\nu}$ is the optimal transport map from $\mu$ to $\nu$.</div>
+      </div>
+    </div>
+    <div style="flex: 0 0 380px;" data-f="1">
+      <img src="figs/ot_transport.svg" alt="an optimal transport plan coupling a source and a target distribution" class="zoomable" style="width: 100%; border-radius: 6px; background: #fff; padding: 8px;">
+      <p class="caption" style="margin-top: 6px;">Optimal transport. <span class="dim">(Figure: Wikipedia)</span></p>
+    </div>
+  </div>
+  <p class="footref" data-f="4" style="margin-top: 8px;">Ambrosio, Gigli &amp; Savar&eacute; (2008), <i>Gradient Flows: In Metric Spaces and in the Space of Probability Measures</i>.</p>
+</section>
+
+<!-- ====== 11. The action ====== -->
+<section class="slide slide-content" data-notes="Emotional core of the talk. This is the 'why action' answer to the skeptic: action stays polynomial where the LSI constant explodes.">
+  <p class="overline">The core quantity</p>
+  <h2 class="title-large">The action</h2>
+  <div class="math-block" data-f="1" style="margin: 4px 0; text-align: center;">
+    $$\mathcal{A} := \int_0^1 |\dot\pi|_\theta^2\,\mathrm{d}\theta$$
+  </div>
+  <p class="caption" data-f="1" style="text-align: center; margin-top: 4px;">the &ldquo;kinetic energy&rdquo; of the curve</p>
+  <ul class="point-list compact" data-f="2">
+    <li>$\mathcal{A} \ge W_2^2(\pi_0,\pi_1)$, with equality on the constant-speed geodesic.</li>
+    <li>Weaker than isoperimetry: if $\rho_t$ is $C_{\mathrm{PI}}(\rho_t)$-PI then $\mathcal{A}\le\int_0^1 2\,C_{\mathrm{PI}}(\rho_t)\,\|\partial_t\log\rho_t\|_{L^2(\rho_t)}^2\,\mathrm{d}t$.</li>
+  </ul>
+  <div class="card-result" data-f="3" style="padding: 12px 20px;">
+    <p class="body-sm"><strong>Example (heat-flow curve $\rho_t=\rho_0*\mathcal{N}(0,2St\,I)$).</strong> For any Gaussian mixture $\rho_0=\sum_{i=1}^N w_i\,\mathcal{N}(\mu_i,\sigma^2 I)$:</p>
+    <div class="math-block" style="margin: 6px 0; background: transparent; border: none; text-align: center; padding: 0;">
+      $$\mathcal{A} \le \frac{Sd}{2}\,\log\!\Big(1+\frac{2S}{\sigma^2}\Big)$$
+    </div>
+    <p class="body-sm"><span class="hl">Independent</span> of the number of modes $N$, weights $w_i$, and means $\mu_i$ &mdash; while LSI / PI constants blow up <span class="hl-nc">exponentially</span> in $\max_{i,j}\|\mu_i-\mu_j\|$.</p>
+  </div>
+  <p class="caption" data-f="3" style="text-align: center; font-style: italic;">The action sees through multimodality that isoperimetry cannot.</p>
+</section>
+
+<!-- ====== 12. Girsanov ====== -->
+<section class="slide slide-content" data-notes="Keep it as a black-box identity. The audience needs to trust it, not prove it.">
+  <p class="overline">The toolkit</p>
+  <h2 class="title-large">Girsanov on path measures</h2>
+  <div class="flex-col" style="gap: 12px; flex: 1; justify-content: center;">
+    <p class="body-text" data-f="1">Take two SDEs driven by Brownian motion, $t\in[0,T]$:</p>
+    <div class="math-block" data-f="1" style="margin: 0;">
+      $$\mathrm{d}X_t = a_t(X_t)\,\mathrm{d}t + \sigma\,\mathrm{d}B_t,\;\; X_0\sim\mu; \qquad \mathrm{d}Y_t = b_t(Y_t)\,\mathrm{d}t + \sigma\,\mathrm{d}B_t,\;\; Y_0\sim\nu.$$
+    </div>
+    <p class="body-text" data-f="2">The KL between their <span class="hl">path measures</span> $\mathbb{P}^X, \mathbb{P}^Y$ is</p>
+    <div class="math-block key-result" data-f="2" style="margin: 0; text-align: center;">
+      $$\mathrm{KL}(\mathbb{P}^X\,\|\,\mathbb{P}^Y) = \mathrm{KL}(\mu\,\|\,\nu) + \frac{1}{2\sigma^2}\int_0^T \mathbb{E}_{\mathbb{P}^X}\big\|a_t(X_t) - b_t(X_t)\big\|^2\,\mathrm{d}t.$$
+    </div>
+  </div>
+  <!-- <p class="footref" data-f="2" style="margin-top: 6px;">&Uuml;st&uuml;nel &amp; Zakai (2013), <i>Transformation of Measure on Wiener Space</i> (Prop.&nbsp;2.3.1 &amp; Cor.&nbsp;2.3.1).</p> -->
+</section>
+
+<!-- ====== 12b. Big picture (before the ALD / JE proofs) ====== -->
+<section class="slide slide-content">
+  <p class="overline">The big picture</p>
+  <h2 class="title-large">The proof idea: three path measures</h2>
+  <div data-f="1" style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+    <img src="figs/analysis.jpg" alt="analysis framework: forward, backward, reference paths" class="zoomable" style="max-width: 90%; max-height: 430px; border-radius: 6px;">
+    <p class="caption" style="margin-top: 8px;">Forward $\mathbb{P}^{\rightarrow}$ (the algorithm), backward $\mathbb{P}^{\leftarrow}$, and the compensated reference $\mathbb{P}$ threading the intermediates $\pi_{\theta_\ell}$.</p>
+  </div>
+</section>
+
+<!-- ====== 13. Continuous, left rail ====== -->
+<section class="slide slide-content" data-notes="The cleanest derivation; make the audience feel the action drop out inevitably from the optimal compensating field. Slogan: move slower, sample better — the action controls the difficulty of the sampling curve; this is global path error, not local LSI decay.">
+  <p class="overline" style="color: var(--accent);">Continuous analysis &middot; left rail (sampling)</p>
+  <h2 class="title-large">Error analysis of annealed Langevin diffusion</h2>
+  <div class="flex-col" style="gap: 6px; flex: 1;">
+    <p class="body-sm" data-f="1">Consider two SDEs started at $X_0\sim\tilde\pi_0$, &nbsp; and let $\tilde\pi_t := \pi_{t/T}$:</p>
+    <div class="math-block" data-f="1" style="margin: 0; padding: 8px 18px;">
+      $$\begin{aligned}
+      \mathbb{P}^{\rightarrow}\ (\text{ALD}):\quad & \mathrm{d}X_t = \nabla\log\tilde\pi_t(X_t)\,\mathrm{d}t + \sqrt{2}\,\mathrm{d}B_t,\\[2pt]
+      \mathbb{P}\ (\text{compensated}):\quad & \mathrm{d}X_t = \big(\nabla\log\tilde\pi_t(X_t) + v_t(X_t)\big)\,\mathrm{d}t + \sqrt{2}\,\mathrm{d}B_t.
+      \end{aligned}$$
+    </div>
+    <p class="body-sm" data-f="2">Pick $v_t$ s.t. $X_t\sim\tilde\pi_t$ for all $t$; by Fokker&ndash;Planck, this means $v_t$ <span class="hl">generates</span> $\tilde\pi_t$:</p>
+    <div class="math-block" data-f="2" style="margin: 0; padding: 8px 18px;">
+      $$\partial_t\tilde\pi_t + \nabla\!\cdot(\tilde\pi_t\, v_t) = 0.$$
+    </div>
+    <div class="math-block" data-f="3" style="margin: 0; padding: 8px 18px;">
+      $$\mathrm{KL}(\mathbb{P}\,\|\,\mathbb{P}^{\rightarrow}) = \frac14\int_0^T \|v_t\|_{L^2(\tilde\pi_t)}^2\,\mathrm{d}t \;\xrightarrow{\ \text{optimal } v^*\ }\; \frac{1}{4T}\int_0^1 |\dot\pi|_\theta^2\,\mathrm{d}\theta = \frac{\mathcal{A}}{4T}.$$
+    </div>
+    <div class="math-block" data-f="4" style="margin: 0; padding: 8px 18px;">
+      $$\mathrm{KL}(\pi\,\|\,\nu^{\mathrm{ALD}}) = \mathrm{KL}(\mathbb{P}_T\,\|\,\mathbb{P}^{\rightarrow}_T) \le \mathrm{KL}(\mathbb{P}\,\|\,\mathbb{P}^{\rightarrow}) = \frac{\mathcal{A}}{4T}\quad(\text{data-processing}).$$
+    </div>
+    <div class="prop-block" data-f="5" style="padding: 8px 16px;">
+      <div class="prop-label">Theorem</div>
+      <div class="prop-body" style="font-style: normal;">$T = \frac{\mathcal{A}}{4\varepsilon^2} \;\Rightarrow\; \mathrm{KL}(\pi\,\|\,\nu^{\mathrm{ALD}})\le\varepsilon^2$, &nbsp; where $\nu^{\mathrm{ALD}}$ is the law of ALD at time $T$.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ====== 14. Continuous, right rail ====== -->
+<section class="slide slide-content" data-notes="Same machine as the sampling side, just with a backward path; emphasize the lag is the only error.">
+  <p class="overline" style="color: var(--accent2);">Continuous analysis &middot; right rail (normalizing constant)</p>
+  <h2 class="title-large">Error analysis of Jarzynski equality</h2>
+  <div class="flex-col" style="gap: 6px; flex: 1;">
+    <p class="body-sm" data-f="1">A new player: the <span class="hl-nc">backward SDE</span> $\mathbb{P}^{\leftarrow}$ &mdash; ALD run backward in time with time-reversed Brownian motion $B^{\leftarrow}$:</p>
+    <div class="math-block" data-f="1" style="margin: 0; padding: 8px 18px;">
+      $$\mathrm{d}X_t = -\nabla\log\tilde\pi_t(X_t)\,\mathrm{d}t + \sqrt{2}\,\mathrm{d}B^{\leftarrow}_t, \quad t\in[0,T], \quad X_T\sim\tilde\pi_T.$$
+    </div>
+    <p class="body-sm" data-f="2"><span class="hl">Crooks fluctuation theorem</span>:</p>
+    <div class="math-block" data-f="2" style="margin: 0; padding: 8px 18px;">
+      $$\log\frac{\mathrm{d}\mathbb{P}^{\rightarrow}}{\mathrm{d}\mathbb{P}^{\leftarrow}}(X) = -\int_0^T (\partial_t\log\tilde\pi_t)(X_t)\,\mathrm{d}t = W(X) - \Delta F \;\Longrightarrow\; \mathbb{E}_{\mathbb{P}^{\rightarrow}}\,\mathrm{e}^{-W} = \mathrm{e}^{-\Delta F}.$$
+    </div>
+    <p class="body-sm" data-f="3">Estimator $\hat Z = Z_0\,\mathrm{e}^{-W(X)}$, $X\sim\mathbb{P}^{\rightarrow}$.</p>
+    <div class="prop-block" data-f="4" style="border-left-color: var(--accent2); background: var(--result-bg); padding: 8px 16px;">
+      <div class="prop-label" style="color: var(--accent2);">Theorem</div>
+      <div class="prop-body" style="font-style: normal;">$T = \dfrac{32\,\mathcal{A}}{\varepsilon^2} \;\Longrightarrow\; \mathrm{Pr}\!\left(\left|\dfrac{\hat Z}{Z} - 1\right| \le \varepsilon\right) \ge \dfrac{3}{4}.$ &nbsp; <span class="dim">(median trick boosts $\frac34$ to $1-\zeta$.)</span></div>
+    </div>
+    <p class="body-sm" data-f="5">Key step: the error is the fluctuation of the RN derivative, bounded through the reference $\mathbb{P}$:</p>
+    <div class="math-block" data-f="5" style="margin: 0; padding: 8px 18px;">
+      $$\mathrm{Pr}\!\left(\Big|\tfrac{\hat Z}{Z}-1\Big|\ge\varepsilon\right) = \mathbb{P}^{\rightarrow}\!\left(\Big|\tfrac{\mathrm{d}\mathbb{P}^{\leftarrow}}{\mathrm{d}\mathbb{P}^{\rightarrow}}-1\Big|\ge\varepsilon\right) \le \frac{\sqrt{2}}{\varepsilon}\left(\sqrt{\mathrm{KL}(\mathbb{P}\,\|\,\mathbb{P}^{\rightarrow})} + \sqrt{\mathrm{KL}(\mathbb{P}\,\|\,\mathbb{P}^{\leftarrow})}\right).$$
+    </div>
+    <p class="footref" data-f="5" style="margin-top: 4px;"><b>Crooks (1998)</b>, <i>Nonequilibrium Measurements of Free Energy Differences for Microscopically Reversible Markovian Systems</i>; <b>Crooks (1999)</b>, <i>Entropy production fluctuation theorem and the nonequilibrium work relation for free energy differences</i>; <b>Vargas, Padhy, Blessing &amp; N&uuml;sken (2024)</b>, <i>Transport meets Variational Inference: Controlled Monte Carlo Diffusions</i>.</p>
+  </div>
+</section>
+
+<!-- ====== 16. Unification ====== -->
+<section class="slide slide-content slide-cover" data-notes="Pause here. This is the thesis. The rail collapses to one column from now on.">
+  <p class="overline" style="color: var(--accent);">The reveal</p>
+  <h2 class="title-large" style="text-align: center; margin-bottom: 18px;">One engine, two tasks</h2>
+  <div class="math-block key-result" data-f="1" style="text-align: center; font-size: 1.3em; padding: 20px 40px;">
+    $$T \asymp \frac{\mathcal{A}}{\varepsilon^2} \quad \text{for both sampling and normalizing constant estimation}$$
+  </div>
+  <p class="title-small" data-f="2" style="text-align: center; margin-top: 16px;">Key quantity: the action $\mathcal{A}=\int_0^1 |\dot\pi|_\theta^2\,\mathrm{d}\theta$.</p>
+  <ul class="point-list" data-f="3" style="margin-top: 14px; max-width: 920px;">
+    <li class="accent">A quantitative <span class="hl">sampling $\rightleftarrows$ counting</span> bridge in the <em>continuous</em>, <em>non-log-concave</em> setting &mdash; a continuous analogue of Jerrum, Valiant &amp; Vazirani.</li>
+    <li class="accent">Isoperimetry does not appear explicitly.</li>
+  </ul>
+  <p class="footref" data-f="3" style="margin-top: 10px; text-align: center;"><b>Jerrum, Valiant &amp; Vazirani (1986)</b>, <i>Random generation of combinatorial structures from a uniform distribution</i>, Theoretical Computer Science.</p>
+</section>
+
+<!-- ====== 17. Discretization + final complexities (merged) ====== -->
+<section class="slide slide-content">
+  <p class="overline">Discrete time</p>
+  <h2 class="title-large">From continuous diffusion to implementable algorithm: final complexities</h2>
+  <ul class="point-list compact" data-f="1">
+    <li>Discretize ALD with the <span class="hl">exponential integrator</span>; one update step per intermediate distribution.</li>
+    <li>A <span class="hl-nc">second</span> error term (discretization error) appears on top of the continuous error $\frac{\mathcal{A}}{T}$, yielding the non-asymptotic complexities:</li>
+  </ul>
+  <div class="rail-cols" data-f="2" style="margin-top: 8px;">
+    <div class="rail-col samp" style="text-align: center;">
+      <div class="rail-label">Sampling (ALMC)</div>
+      <div class="math-block" style="background: transparent; border: none; padding: 6px 0;">$$\widetilde{O}\!\left(\frac{d\,\beta^2\,\mathcal{A}^2}{\varepsilon^6}\right)$$</div>
+      <p class="caption">to reach $\mathrm{KL}(\pi\|\cdot)\le\varepsilon^2$.</p>
+    </div>
+    <div class="rail-col nc" style="text-align: center;">
+      <div class="rail-label">Normalizing constant (AIS)</div>
+      <div class="math-block" style="background: transparent; border: none; padding: 6px 0;">$$\widetilde{O}\!\left(\frac{d^{4/3}}{\varepsilon^2} \vee \frac{m\beta\mathcal{A}^\frac12}{\varepsilon^2} \vee \frac{d\beta^2\mathcal{A}^2}{\varepsilon^4}\right)$$</div>
+      <p class="caption">to get $\hat Z$ s.t. relative error $\le\varepsilon$ w.h.p.</p>
+    </div>
+  </div>
+  <ul class="point-list compact" data-f="3" style="margin-top: 10px;">
+    <li>Both rates are for the <span class="hl">geometric interpolation</span> $\pi_\theta\propto\exp\!\big(-V-\frac{\lambda(\theta)}{2}\|\cdot\|^2\big)$, with $\mathcal{A}$ its action.</li>
+    <li>$\beta$ is the smoothness of potential and $m=\sqrt{\mathbb{E}_\pi\|\cdot\|^2}$. </li>
+    <li>First isoperimetry-free guarantee for normalizing constant estimation.</li>
+    <!-- <li>Reading: the $\varepsilon$-dependence = continuous time $\Theta\!\left(\frac{1}{\varepsilon^2}\right)$ divided by step size $\Theta(\varepsilon^2)$.</li> -->
+    <!-- <li class="dim">$\varepsilon^{-6}$ is admittedly loose vs. LSI's $\varepsilon^{-2}$ &mdash; the price of Girsanov-over-LSI; still the best among isoperimetry-free methods.</li> -->
+  </ul>
+</section>
+
+<!-- ====== 19. MoG: poly vs exp ====== -->
+<section class="slide slide-content" data-notes="Concrete instance where the abstract win becomes a poly-vs-exp gap.">
+  <p class="overline">Theoretical payoff</p>
+  <h2 class="title-large">Mixture of Gaussians: polynomial vs. exponential</h2>
+  <div class="flex-col" style="gap: 6px;">
+    <p class="body-sm" data-f="1">Target: a Gaussian mixture with equal-norm means $\|y_i\|=r$; &nbsp;$V=-\log\pi$ is $B$-smooth with $B=\beta(4r^2\beta+1)$:</p>
+    <div class="math-block" data-f="1" style="margin: 0; padding: 8px 18px;">
+      $$\pi = \sum_{i=1}^N p_i\,\mathcal{N}\!\left(y_i,\ \beta^{-1}I\right), \qquad \textstyle\sum_i p_i = 1,\ \ p_i>0.$$
+    </div>
+    <p class="body-sm" data-f="2">Geometric annealing curve and its action:</p>
+    <div class="math-block" data-f="2" style="margin: 0; padding: 8px 18px;">
+      $$\pi_\theta \propto \exp\!\left(-V - \tfrac{\lambda(\theta)}{2}\|\cdot\|^2\right),\ \ \lambda(\theta)=dB(1-\theta)^\gamma; \qquad \mathcal{A} = O\!\left(d(r^2\beta+1)\Big(r^2 + \tfrac{d}{\beta}\Big)\right).$$
+    </div>
+  </div>
+  <div class="vs-grid" data-f="3" style="margin-top: 10px;">
+    <div class="vs-block good">
+      <div class="vs-label">Ours (via the action)</div>
+      <p class="body-sm">$\mathcal{A}$ is <span class="hl">polynomial</span> $\Rightarrow$ $\mathrm{poly}\!\left(d,\beta,r,\tfrac{1}{\varepsilon}\right)$ oracle complexity.</p>
+    </div>
+    <div class="vs-block bad">
+      <div class="vs-label">LMC under LSI</div>
+      <p class="body-sm">LSI constant $C_{\mathrm{LSI}} = \Omega\!\left(\mathrm{e}^{\Theta(\beta r^2)}\right)$ $\Rightarrow$ <span class="hl-nc">exponential</span> complexity.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ====== 20. The catch ====== -->
+<section class="slide slide-content" data-notes="The quantitative fingerprint of mode switching; it motivates a different curve.">
+  <p class="overline">Beyond geometric interpolation</p>
+  <h2 class="title-large">The catch with geometric interpolation</h2>
+  <div class="flex-col" style="gap: 8px; flex: 1;">
+    <ul class="point-list compact" data-f="1">
+      <li>The whole story hinges on $\mathcal{A}$ being small, but it need not be.</li>
+      <li>1-dimensional example: $\pi = \frac12\mathcal{N}(0,1)+\frac12\mathcal{N}(m,1)$, &nbsp; $\pi_\theta(x)\propto\pi(x)\,\mathrm{e}^{-\lambda(\theta)x^2/2}$, &nbsp; $\lambda(\theta)=m^2(1-\theta)^r$.</li>
+    </ul>
+    <div class="math-block key-result" data-f="2" style="margin: 2px 0; text-align: center;">
+      $$\mathcal{A}_r \gtrsim m^4\,\mathrm{e}^{m^2/40}.$$
+    </div>
+    <p class="caption" data-f="2" style="text-align: center; color: var(--accent2);">exponential in the mode separation</p>
+    <p class="body-text" data-f="3"><strong>Mass teleportation / Mode switching:</strong> weights of the modes change dramatically, so mass must teleport across a large distance.</p>
+    <div data-f="4" style="text-align: center;">
+      <img src="figs/mode-switch.jpg" alt="mode switching: the far mode appears only as theta approaches 1" class="zoomable" style="width: 100%; max-height: 190px; object-fit: contain; border-radius: 6px; background: #fff;">
+      <p class="caption" style="margin-top: 4px;"><span class="dim">Figure: Chemseddine, Wald, Duong &amp; Steidl (2025), <em>Neural Sampling from Boltzmann Densities: Fisher&ndash;Rao Curves in the Wasserstein Geometry</em>, ICLR.</span></p>
+    </div>
+  </div>
+</section>
+
+<!-- ====== 21. OU curve ====== -->
+<section class="slide slide-content" data-notes="Contrast directly with the exponential lower bound on the previous slide.">
+  <p class="overline">Beyond geometric interpolation</p>
+  <h2 class="title-large">A better curve: reverse the OU process</h2>
+  <div class="flex-col" style="gap: 12px; flex: 1; justify-content: center;">
+    <ul class="point-list" data-f="1">
+      <li>Borrow the <span class="hl">diffusion-model</span> curve: run the OU process from $Y_0\sim\pi$, &nbsp; $\mathrm{d}Y_t = -Y_t\,\mathrm{d}t + \sqrt{2}\,\mathrm{d}B_t,\quad Y_t\sim\bar\pi_t$, &nbsp; $\bar\pi_t\to\mathcal{N}(0,I)$ as $t\to\infty$.</li>
+      <li>Its <span class="hl">time-reverse</span> $(\bar\pi_{T-t})_{t\in[0,T]}$ is the annealing curve we use.</li>
+    </ul>
+    <div class="prop-block" data-f="2">
+      <div class="prop-label">Proposition</div>
+      <div class="prop-body" style="font-style: normal;">
+        Let $\pi\propto\mathrm{e}^{-V}$ with $V$ $\beta$-smooth, and finite second moment $m^2 := \mathbb{E}_\pi\|\cdot\|^2 < \infty$. Then the action of the reverse-OU curve satisfies
+        $$\int_0^\infty |\dot{\bar\pi}|_t^2\,\mathrm{d}t \;\le\; d\beta + m^2.$$
+      </div>
+    </div>
+    <ul class="point-list compact" data-f="3">
+      <li class="accent">By our JE theorem, this curve should estimate $Z$ far more efficiently.</li>
+    </ul>
+    <ul class="point-list compact" data-f="4">
+      <li class="accent">This also partially explains why diffusion models work well: their trajectory is smooth in the Wasserstein geometry.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ====== 22. Reverse diffusion samplers (RDS) ====== -->
+<section class="slide slide-content">
+  <p class="overline">Beyond geometric interpolation</p>
+  <h2 class="title-large">Reverse diffusion samplers (RDS) for normalizing constant estimation</h2>
+  <div class="flex-col" style="gap: 6px; flex: 1;">
+    <p class="body-sm" data-f="1"><span class="hl-nc">RDS</span> (RDMC / RSDMC / ZODMC / SNDMC) simulate the time-reversal of OU with a learning-free score estimator $s_t \approx \nabla\log\bar\pi_t$:</p>
+    <div class="math-block" data-f="2" style="margin: 0; padding: 8px 18px;">
+      $$\begin{aligned}
+      \widehat{\mathbb{Q}}\ (\text{run}):\quad & \mathrm{d}X_t = \big(X_t + 2\,s_{T-t_-}(X_{t_-})\big)\,\mathrm{d}t + \sqrt{2}\,\mathrm{d}B_t, & X_0\sim\phi=\mathcal{N}(0,I),\\[2pt]
+      \mathbb{Q}\ (\text{ideal}):\quad & \mathrm{d}X_t = \big(X_t + 2\,\nabla\log\bar\pi_{T-t}(X_t)\big)\,\mathrm{d}t + \sqrt{2}\,\mathrm{d}B_t, & X_0\sim\bar\pi_T.
+      \end{aligned}$$
+    </div>
+    <p class="body-sm" data-f="3">Estimator $\hat Z = \mathrm{e}^{-W(X)}$, $X\sim\widehat{\mathbb{Q}}$, with the work functional</p>
+    <div class="math-block" data-f="3" style="margin: 0; padding: 8px 18px;">
+      $$W(X) = \log\phi(X_0) + V(X_{T-\delta}) - (T-\delta)d + \int_0^{T-\delta}\!\Big(\|s_{T-t_-}(X_{t_-})\|^2\,\mathrm{d}t + \sqrt{2}\,\big\langle s_{T-t_-}(X_{t_-}),\,\mathrm{d}B_t\big\rangle\Big).$$
+    </div>
+    <div class="prop-block" data-f="4" style="border-left-color: var(--accent2); background: var(--result-bg); padding: 8px 16px;">
+      <div class="prop-label" style="color: var(--accent2);">Theorem</div>
+      <div class="prop-body" style="font-style: normal;">If $\mathrm{KL}(\mathbb{Q}\,\|\,\widehat{\mathbb{Q}})\lesssim\varepsilon^2$ and $\mathrm{TV}(\pi,\bar\pi_\delta)\lesssim\varepsilon$, then $\mathrm{Pr}\!\left(\left|\dfrac{\hat Z}{Z}-1\right|\le\varepsilon\right)\ge\dfrac{3}{4}$.</div>
+    </div>
+    <p class="footref" data-f="4" style="margin-top: 4px;"><b>RDMC:</b> Huang, Dong, Hao, Ma &amp; Zhang (ICLR 2024), <i>Reverse Diffusion Monte Carlo</i>. &nbsp;<b>RSDMC:</b> Huang, Zou, Dong, Ma &amp; Zhang (COLT 2024), <i>Faster Sampling without Isoperimetry via Diffusion-based Monte Carlo</i>. &nbsp;<b>ZODMC:</b> He, Rojas &amp; Tao (NeurIPS 2024), <i>Zeroth-Order Sampling Methods for Non-Log-Concave Distributions: Alleviating Metastability by Denoising Diffusion</i>. &nbsp;<b>SNDMC:</b> Vacher, Chehab &amp; Korba (NeurIPS 2025), <i>Sampling from multi-modal distributions with polynomial query complexity in fixed dimension via reverse diffusion</i>.</p>
+  </div>
+</section>
+
+<!-- ====== 23. The fundamental trade-off ====== -->
+<section class="slide slide-content">
+  <p class="overline">Beyond geometric interpolation &middot; the closing idea</p>
+  <h2 class="title-large">The fundamental trade-off</h2>
+  <ul class="point-list" data-f="1">
+    <li class="accent">Insight: <span class="hl">RDS = optimally compensated ALD on the OU trajectory.</span></li>
+  </ul>
+  <div class="vs-grid" data-f="2" style="margin-top: 10px;">
+    <div class="vs-block good">
+      <div class="vs-label">Tractable curve (geometric)</div>
+      <p class="body-sm">Closed-form drift $\nabla\log\pi_\theta$, but possibly <span class="hl-nc">exponential action</span> $\mathcal{A}$.</p>
+    </div>
+    <div class="vs-block good" style="background: rgba(194,105,28,0.05); border-color: rgba(194,105,28,0.14);">
+      <div class="vs-label" style="color: var(--accent2);">OU curve</div>
+      <p class="body-sm"><span class="hl">Polynomial action</span> $\mathcal{A}$, but the drift $\nabla\log\bar\pi_t$ has no closed form $\Rightarrow$ must be estimated.</p>
+    </div>
+  </div>
+  <p class="title-small" data-f="3" style="text-align: center; margin-top: 18px;">You pay either in the curve or in the drift.</p>
+</section>
+
+<!-- ====== 23. Summary ====== -->
+<section class="slide slide-content" data-notes="Restate the thesis in four lines; this is the slide that stays up during the first questions.">
+  <p class="overline">Wrap up</p>
+  <h2 class="title-large">Summary</h2>
+  <ul class="point-list" data-f="1" style="flex: 1; justify-content: center;">
+    <li>One framework (<span class="hl">Girsanov + optimal transport</span>) $\to$ both sampling and $Z$-estimation.</li>
+    <li data-f="2"><span class="hl">Action $\mathcal{A}$</span> is the governing quantity; continuous time complexity $T \asymp \frac{\mathcal{A}}{\varepsilon^2}$ for both.</li>
+    <li data-f="3"><span class="hl">Isoperimetry-free</span>; a continuous sampling $\rightleftarrows$ counting bridge.</li>
+    <li class="accent" data-f="4">Curve-vs-drift trade-off explains when annealing wins and motivates RDS.</li>
+  </ul>
+</section>
+
+<!-- ====== 24. Future directions ====== -->
+<section class="slide slide-content">
+  <p class="overline">Looking ahead</p>
+  <h2 class="title-large">Future directions</h2>
+  <ul class="point-list" data-f="1" style="flex: 1; justify-content: center;">
+    <li>More general diffusion processes beyond overdamped Langevin.</li>
+    <li data-f="2">Task-specific design of the annealing curve / schedule.</li>
+  </ul>
+</section>
+
+<!-- ====== 25. Closely related & follow-up work ====== -->
+<section class="slide slide-content">
+  <p class="overline">Looking ahead</p>
+  <h2 class="title-large">Closely related &amp; follow-up work</h2>
+  <ul class="point-list compact" data-f="1" style="flex: 1; justify-content: center;">
+    <li><strong>Provable Convergence and Limitations of Geometric Tempering for Langevin Dynamics.</strong> Chehab, Korba, Stromme &amp; Vacher (ICLR 2025) &mdash; geometric interpolation may slow down Langevin dynamics due to mode switching.</li>
+    <li data-f="2"><strong>Diffusion Annealed Langevin Dynamics: a Theoretical Study.</strong> Cattiaux, Cordero-Encinar &amp; Guillin (arXiv:2511.10406) &mdash; rigorous study of annealed Langevin diffusions and the action of interpolation curves for general targets.</li>
+    <!-- <li data-f="3"><strong>Non-asymptotic Analysis of Diffusion Annealed Langevin Monte Carlo for Generative Modelling.</strong> Cordero-Encinar, Akyildiz &amp; Duncan (arXiv:2502.09306) &mdash; non-asymptotic KL bounds along Gaussian / heavy-tailed paths for generative modelling.</li> -->
+    <li data-f="3"><strong>Discrete Optimal Transport: Rapid Convergence of Simulated Annealing Algorithms.</strong> He, Jiang, Wang &amp; Zhang (arXiv:2605.05877) &mdash; extends the action-based annealing analysis to discrete distributions and CTMCs.</li>
+  </ul>
+</section>
+
+<!-- ====== 25. Thanks ====== -->
+<section class="slide slide-cover" data-notes="Verbal thanks to collaborators; leave the two arXiv links up for Q&A.">
+  <h1 class="title-mega" style="font-size: 64px; color: #1e3a8a;">Thank you!</h1>
+  <p class="body-text" data-f="1" style="color: var(--muted); margin-top: 16px;">Joint work with Molei Tao &amp; Yongxin Chen.</p>
+  <div class="flex-col" data-f="2" style="margin-top: 30px; gap: 6px; align-items: center;">
+    <p class="caption">Sampling (ICLR&rsquo;25): &nbsp;<a href="https://arxiv.org/abs/2407.16936" style="color: var(--accent); text-decoration: none;">arxiv.org/abs/2407.16936</a></p>
+    <p class="caption">Normalizing constant (ICLR&rsquo;26): &nbsp;<a href="https://arxiv.org/abs/2502.04575" style="color: var(--accent); text-decoration: none;">arxiv.org/abs/2502.04575</a></p>
+    <p class="caption">Created with Opus 4.8 using the Codeck skill (<a href="https://github.com/hiyeshu/codeck" style="color: var(--accent); text-decoration: none;">https://github.com/hiyeshu/codeck</a>)</p>
+  </div>
+  <!-- <p class="caption" data-f="3" style="margin-top: 28px; color: var(--muted);">Questions &mdash; including during the talk &mdash; welcome.</p> -->
+</section>
+
+</div>
+<script>
+/* ─── codeck engine v2.0 ─── */
+/* Slide engine: navigation, fragments, overview, presenter, toolbar */
+/* Inlined by assemble.sh — AI does not modify this file */
+
+(function () {
+  'use strict';
+
+  /* ─── Constants ─── */
+  var REF_W = 1280;
+  var REF_H = 720;
+  var TOOLBAR_HIDE_MS = 3000;
+
+  /* ─── SVG icons (inline, 20x20 viewBox) ─── */
+  var ICON = {
+    grid: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="6" height="6" rx="1"/><rect x="11" y="3" width="6" height="6" rx="1"/><rect x="3" y="11" width="6" height="6" rx="1"/><rect x="11" y="11" width="6" height="6" rx="1"/></svg>',
+    left: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 4l-6 6 6 6"/></svg>',
+    right: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 4l6 6-6 6"/></svg>',
+    presenter: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="16" height="11" rx="1.5"/><path d="M7 17h6M10 14v3"/></svg>',
+    fullscreen: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 7V4a1 1 0 011-1h3M13 3h3a1 1 0 011 1v3M17 13v3a1 1 0 01-1 1h-3M7 17H4a1 1 0 01-1-1v-3"/></svg>',
+    exitfs: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M7 3v3a1 1 0 01-1 1H3M17 7h-3a1 1 0 01-1-1V3M13 17v-3a1 1 0 011-1h3M3 13h3a1 1 0 011 1v3"/></svg>',
+    zoomin: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="10" cy="10" r="6"/><path d="M10 7v6M7 10h6"/></svg>',
+    zoomout: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="10" cy="10" r="6"/><path d="M7 10h6"/></svg>',
+    sun: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="10" cy="10" r="4"/><path d="M10 2v2M10 16v2M2 10h2M16 10h2M4.93 4.93l1.41 1.41M13.66 13.66l1.41 1.41M4.93 15.07l1.41-1.41M13.66 6.34l1.41-1.41"/></svg>',
+    moon: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 11.5a7 7 0 01-9.5-6.5 7 7 0 109.5 6.5z"/></svg>'
+  };
+
+  /* ─── State ─── */
+  var slides = [];
+  var cur = 0;
+  var frag = 0;
+  var inOverview = false;
+  var isPresenter = /[?&]presenter/.test(location.search);
+  var isPrint = /[?&]print/.test(location.search);
+  var channel = null;
+  var toolbarTimer = null;
+  var timerSecs = 0;
+  var timerIv = null;
+  var timerStarted = false;
+  var notesFontSize = 16;
+
+  /* ─── Init ─── */
+  function init() {
+    slides = Array.from(document.querySelectorAll('.slide'));
+    if (!slides.length) return;
+    channel = new BroadcastChannel('codeck-sync');
+    channel.onmessage = onSync;
+    if (isPrint) {
+      initPrint();
+      return;
+    }
+    if (isPresenter) {
+      initPresenter();
+    } else {
+      createSlideUI();
+    }
+    goto(0);
+    bindKeys();
+    if (!isPresenter) bindTouch();
+    fouc();
+  }
+
+  /* ─── FOUC protection ─── */
+  function fouc() {
+    requestAnimationFrame(function () {
+      requestAnimationFrame(function () {
+        document.getElementById('app').classList.add('ready');
+      });
+    });
+  }
+
+  /* ─── Navigation ─── */
+  function goto(n, silent) {
+    if (n < 0 || n >= slides.length) return;
+    if (cur !== n) {
+      slides[cur].classList.remove('active');
+      resetFragments(slides[cur]);
+    }
+    cur = n;
+    frag = 0;
+    slides[n].classList.add('active');
+    resetFragments(slides[n]);
+    updateProgress();
+    if (isPresenter) {
+      updatePresenter();
+      autoStartTimer();
+    }
+    if (!silent) sync({ t: 'g', s: n });
+  }
+
+  function next() {
+    if (inOverview) return;
+    goto(cur + 1);
+  }
+
+  function prev() {
+    if (inOverview) return;
+    goto(cur - 1);
+  }
+
+  /* ─── Fragments ─── */
+  function maxFrag(slide) {
+    var m = 0;
+    slide.querySelectorAll('[data-f]').forEach(function (el) {
+      m = Math.max(m, parseInt(el.dataset.f, 10) || 0);
+    });
+    return m;
+  }
+
+  function resetFragments(slide) {
+    slide.querySelectorAll('[data-f]').forEach(function (el) {
+      el.classList.remove('visible');
+    });
+    slide.dataset.step = '0';
+  }
+
+  function showUpTo(slide, step) {
+    slide.querySelectorAll('[data-f]').forEach(function (el) {
+      var f = parseInt(el.dataset.f, 10) || 0;
+      el.classList.toggle('visible', f <= step);
+    });
+    slide.dataset.step = String(step);
+  }
+
+  function stepDown() {
+    if (inOverview) return;
+    var slide = slides[cur];
+    var max = maxFrag(slide);
+    if (frag < max) {
+      frag++;
+      showUpTo(slide, frag);
+      updateProgress();
+      sync({ t: 'f', s: cur, f: frag });
+      if (isPresenter) {
+        updatePresenter();
+        autoStartTimer();
+      }
+    } else {
+      goto(cur + 1);
+    }
+  }
+
+  function stepUp() {
+    if (inOverview) return;
+    var slide = slides[cur];
+    if (frag > 0) {
+      frag--;
+      showUpTo(slide, frag);
+      updateProgress();
+      sync({ t: 'f', s: cur, f: frag });
+      if (isPresenter) updatePresenter();
+    } else if (cur > 0) {
+      goto(cur - 1);
+      var p = slides[cur];
+      frag = maxFrag(p);
+      showUpTo(p, frag);
+      updateProgress();
+    }
+  }
+
+  /* ─── Overview (clone-based thumbnails) ─── */
+  function toggleOverview() {
+    inOverview = !inOverview;
+    var app = document.getElementById('app');
+    app.classList.toggle('overview', inOverview);
+
+    if (inOverview) {
+      /* Hide real slides (in presenter they're already hidden) */
+      if (!isPresenter) {
+        slides.forEach(function (s) { s.style.display = 'none'; });
+      }
+
+      /* Build thumbnail grid */
+      var grid = document.createElement('div');
+      grid.id = 'ov-grid';
+      slides.forEach(function (s, i) {
+        var cell = document.createElement('div');
+        cell.className = 'ov-cell' + (i === cur ? ' ov-active' : '');
+        cell.onclick = function () { toggleOverview(); goto(i); };
+        var vp = document.createElement('div');
+        vp.className = 'ov-viewport';
+        cell.appendChild(vp);
+        var label = document.createElement('div');
+        label.className = 'ov-label';
+        var h = s.querySelector('h1, h2');
+        var title = h ? h.textContent.trim() : '';
+        label.textContent = (i + 1) + (title ? '. ' + title : '');
+        cell.appendChild(label);
+        grid.appendChild(cell);
+      });
+      app.appendChild(grid);
+
+      /* Render clones after layout (so clientWidth is measured) */
+      requestAnimationFrame(function () {
+        grid.querySelectorAll('.ov-viewport').forEach(function (vp, i) {
+          renderPreview(vp, i, maxFrag(slides[i]));
+        });
+      });
+    } else {
+      /* Tear down grid */
+      var grid = document.getElementById('ov-grid');
+      if (grid) grid.parentNode.removeChild(grid);
+      /* Restore slides only in slide view (not presenter) */
+      if (!isPresenter) {
+        slides.forEach(function (s) { s.style.display = ''; });
+        slides.forEach(function (s, i) {
+          if (i !== cur) s.classList.remove('active');
+        });
+        resetFragments(slides[cur]);
+        showUpTo(slides[cur], frag);
+      } else {
+        updatePresenter();
+      }
+    }
+  }
+
+  /* ─── BroadcastChannel sync ─── */
+  function sync(data) {
+    if (channel) channel.postMessage(data);
+  }
+
+  function onSync(e) {
+    var d = e.data;
+    if (d.t === 'g') {
+      goto(d.s, true);
+    } else if (d.t === 'f') {
+      if (d.s !== cur) goto(d.s, true);
+      frag = d.f;
+      showUpTo(slides[cur], frag);
+      updateProgress();
+      if (isPresenter) updatePresenter();
+    } else if (d.t === 'sync?' && !isPresenter) {
+      sync({ t: 'g', s: cur });
+      if (frag > 0) sync({ t: 'f', s: cur, f: frag });
+    }
+  }
+
+  /* ─── Fullscreen ─── */
+  function toggleFullscreen() {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().catch(function () {});
+    } else {
+      document.exitFullscreen().catch(function () {});
+    }
+  }
+
+  /* ─── Slide view UI ─── */
+  function createSlideUI() {
+    var app = document.getElementById('app');
+
+    /* Segmented progress bar */
+    var prog = document.createElement('div');
+    prog.id = 'progress';
+    slides.forEach(function (s, i) {
+      var seg = document.createElement('div');
+      seg.className = 'progress-seg';
+      seg.onclick = function () { goto(i); };
+      var fill = document.createElement('div');
+      fill.className = 'progress-fill';
+      seg.appendChild(fill);
+      prog.appendChild(seg);
+    });
+    app.appendChild(prog);
+
+    /* Floating toolbar */
+    var tb = document.createElement('div');
+    tb.id = 'slide-toolbar';
+    tb.innerHTML = [
+      '<button class="tb-btn" data-act="overview" data-tip="Overview (Esc)">' + ICON.grid + '</button>',
+      '<button class="tb-btn" data-act="prev" data-tip="Previous (\u2190)">' + ICON.left + '</button>',
+      '<span class="tb-counter" id="slide-counter"></span>',
+      '<button class="tb-btn" data-act="next" data-tip="Next (\u2192)">' + ICON.right + '</button>',
+      '<button class="tb-btn" data-act="presenter" data-tip="Presenter (P)">' + ICON.presenter + '</button>',
+      '<button class="tb-btn" data-act="fullscreen" data-tip="Fullscreen (F)">' + ICON.fullscreen + '</button>'
+    ].join('');
+    app.appendChild(tb);
+
+    tb.addEventListener('click', function (e) {
+      var btn = e.target.closest('[data-act]');
+      if (!btn) return;
+      var a = btn.dataset.act;
+      if (a === 'prev') stepUp();
+      else if (a === 'next') stepDown();
+      else if (a === 'overview') toggleOverview();
+      else if (a === 'presenter') openPresenter();
+      else if (a === 'fullscreen') toggleFullscreen();
+    });
+
+    /* Show toolbar when mouse enters bottom zone, hide on leave */
+    var isTouchDevice = 'ontouchstart' in window;
+    if (!isTouchDevice) {
+      var ZONE_H = 80;
+      document.addEventListener('mousemove', function (e) {
+        var inZone = e.clientY > window.innerHeight - ZONE_H;
+        if (inZone || tb.matches(':hover')) {
+          tb.classList.add('tb-visible');
+        } else {
+          tb.classList.remove('tb-visible');
+        }
+      });
+      tb.addEventListener('mouseleave', function () {
+        tb.classList.remove('tb-visible');
+      });
+    }
+
+    /* Update fullscreen icon on change + flash toolbar on enter */
+    document.addEventListener('fullscreenchange', function () {
+      var fsBtn = tb.querySelector('[data-act="fullscreen"]');
+      if (fsBtn) fsBtn.innerHTML = document.fullscreenElement ? ICON.exitfs : ICON.fullscreen;
+      if (document.fullscreenElement && !isTouchDevice) {
+        tb.classList.add('tb-visible');
+        clearTimeout(toolbarTimer);
+        toolbarTimer = setTimeout(function () { tb.classList.remove('tb-visible'); }, 2000);
+      }
+    });
+
+    /* Keyboard hints (desktop only, once per session) */
+    if (!isTouchDevice && !sessionStorage.getItem('codeck-hints')) {
+      var hints = document.createElement('div');
+      hints.id = 'key-hints';
+      hints.innerHTML = '<kbd>&larr;</kbd> <kbd>&rarr;</kbd> Navigate &nbsp; <kbd>Esc</kbd> Overview &nbsp; <kbd>P</kbd> Presenter &nbsp; <kbd>F</kbd> Fullscreen';
+      app.appendChild(hints);
+      sessionStorage.setItem('codeck-hints', '1');
+      setTimeout(function () { hints.classList.add('hints-fade'); }, 100);
+      setTimeout(function () { if (hints.parentNode) hints.parentNode.removeChild(hints); }, 4000);
+    }
+  }
+
+  function updateProgress() {
+    var segs = document.querySelectorAll('.progress-seg');
+    if (!segs.length) return;
+    segs.forEach(function (seg, i) {
+      var fill = seg.querySelector('.progress-fill');
+      if (!fill) return;
+      if (i < cur) {
+        fill.style.width = '100%';
+      } else if (i === cur) {
+        var max = maxFrag(slides[i]);
+        var pct = max > 0 ? ((frag + 1) / (max + 1) * 100) : 100;
+        fill.style.width = pct + '%';
+      } else {
+        fill.style.width = '0%';
+      }
+    });
+    var ctr = document.getElementById('slide-counter');
+    if (ctr) ctr.textContent = (cur + 1) + ' / ' + slides.length;
+
+    /* Also update presenter counter if it exists */
+    var pctr = document.getElementById('pv-counter');
+    if (pctr) pctr.textContent = (cur + 1) + ' / ' + slides.length;
+  }
+
+  /* ─── Presenter mode ─── */
+  function openPresenter() {
+    var base = location.href.split('?')[0].split('#')[0];
+    window.open(base + '?presenter', 'codeck-presenter',
+      'width=1200,height=800,menubar=no,toolbar=no');
+  }
+
+  function initPresenter() {
+    slides.forEach(function (s) { s.style.display = 'none'; });
+    var app = document.getElementById('app');
+    app.classList.add('presenter-mode');
+
+    var grid = document.createElement('div');
+    grid.className = 'presenter-grid';
+    grid.innerHTML = [
+      '<div class="pv-main"><div class="pv-viewport" id="pv-cur"></div></div>',
+      '<div class="pv-side">',
+      '  <div class="pv-next-wrap"><div class="pv-viewport" id="pv-next"></div></div>',
+      '  <div class="pv-notes-wrap">',
+      '    <div class="pv-notes-body" id="pv-notes"></div>',
+      '  </div>',
+      '</div>',
+      '<div class="pv-toolbar">',
+      '  <div class="pv-toolbar-group">',
+      '    <button class="pv-btn" data-act="prev" data-tip="Previous (\u2190)">' + ICON.left + '</button>',
+      '    <button class="pv-btn" data-act="next" data-tip="Next (\u2192)">' + ICON.right + '</button>',
+      '    <span class="pv-counter" id="pv-counter"></span>',
+      '  </div>',
+      '  <div class="pv-toolbar-group">',
+      '    <button class="pv-btn" data-act="overview" data-tip="Overview (Esc)">' + ICON.grid + '</button>',
+      '    <button class="pv-btn" data-act="fullscreen" data-tip="Fullscreen (F)">' + ICON.fullscreen + '</button>',
+      '  </div>',
+      '  <div class="pv-toolbar-group">',
+      '    <button class="pv-btn pv-btn-sm" data-act="zoom-out" data-tip="Zoom out">' + ICON.zoomout + '</button>',
+      '    <button class="pv-btn pv-btn-sm" data-act="zoom-in" data-tip="Zoom in">' + ICON.zoomin + '</button>',
+      '  </div>',
+      '  <div class="pv-toolbar-group">',
+      '    <button class="pv-btn pv-btn-sm" data-act="theme" data-tip="Toggle theme" id="pv-theme-btn">' + ICON.sun + '</button>',
+      '  </div>',
+      '  <div class="pv-toolbar-group pv-timer-group">',
+      '    <span class="pv-time" id="pv-time" data-tip="Click: pause. Double-click: reset">00:00</span>',
+      '  </div>',
+      '</div>'
+    ].join('\n');
+    app.insertBefore(grid, app.firstChild);
+
+    /* Segmented progress for presenter */
+    var prog = document.createElement('div');
+    prog.id = 'progress';
+    prog.className = 'pv-progress';
+    slides.forEach(function (s, i) {
+      var seg = document.createElement('div');
+      seg.className = 'progress-seg';
+      seg.onclick = function () { goto(i); };
+      var fill = document.createElement('div');
+      fill.className = 'progress-fill';
+      seg.appendChild(fill);
+      prog.appendChild(seg);
+    });
+    grid.appendChild(prog);
+
+    /* Toolbar actions */
+    grid.addEventListener('click', function (e) {
+      var btn = e.target.closest('[data-act]');
+      if (!btn) return;
+      var a = btn.dataset.act;
+      if (a === 'prev') stepUp();
+      else if (a === 'next') stepDown();
+      else if (a === 'overview') toggleOverview();
+      else if (a === 'fullscreen') toggleFullscreen();
+      else if (a === 'zoom-in') zoomNotes(2);
+      else if (a === 'zoom-out') zoomNotes(-2);
+      else if (a === 'theme') togglePresenterTheme();
+    });
+
+    /* Timer: click = pause/resume, double-click = reset */
+    var timeEl = document.getElementById('pv-time');
+    timeEl.addEventListener('click', function () {
+      if (timerIv) {
+        clearInterval(timerIv); timerIv = null;
+      } else {
+        timerIv = setInterval(function () { timerSecs++; timeEl.textContent = fmtTime(timerSecs); }, 1000);
+      }
+    });
+    timeEl.addEventListener('dblclick', function () {
+      timerSecs = 0; timeEl.textContent = '00:00';
+      if (timerIv) { clearInterval(timerIv); timerIv = null; }
+      timerStarted = false;
+    });
+
+    /* Fullscreen icon update */
+    document.addEventListener('fullscreenchange', function () {
+      var fsBtn = grid.querySelector('[data-act="fullscreen"]');
+      if (fsBtn) fsBtn.innerHTML = document.fullscreenElement ? ICON.exitfs : ICON.fullscreen;
+    });
+
+    /* Set initial theme icon: respect existing data-ui-theme or system preference */
+    var themeBtn = document.getElementById('pv-theme-btn');
+    if (themeBtn) {
+      var uiTheme = document.documentElement.getAttribute('data-ui-theme');
+      var isLight = uiTheme ? uiTheme === 'light' : window.matchMedia('(prefers-color-scheme: light)').matches;
+      themeBtn.innerHTML = isLight ? ICON.moon : ICON.sun;
+    }
+
+    sync({ t: 'sync?' });
+  }
+
+  function autoStartTimer() {
+    if (timerStarted) return;
+    timerStarted = true;
+    var timeEl = document.getElementById('pv-time');
+    if (!timeEl) return;
+    timerIv = setInterval(function () { timerSecs++; timeEl.textContent = fmtTime(timerSecs); }, 1000);
+  }
+
+  function fmtTime(s) {
+    return String(Math.floor(s / 60)).padStart(2, '0') + ':' +
+           String(s % 60).padStart(2, '0');
+  }
+
+  function zoomNotes(delta) {
+    notesFontSize = Math.max(10, Math.min(32, notesFontSize + delta));
+    var el = document.getElementById('pv-notes');
+    if (el) el.style.fontSize = notesFontSize + 'px';
+  }
+
+  function togglePresenterTheme() {
+    var html = document.documentElement;
+    var current = html.getAttribute('data-ui-theme');
+    var next;
+    if (current === 'light') next = 'dark';
+    else if (current === 'dark') next = 'light';
+    else next = window.matchMedia('(prefers-color-scheme: light)').matches ? 'dark' : 'light';
+    html.setAttribute('data-ui-theme', next);
+    var btn = document.getElementById('pv-theme-btn');
+    if (btn) btn.innerHTML = next === 'light' ? ICON.moon : ICON.sun;
+  }
+
+  function updatePresenter() {
+    var curEl = document.getElementById('pv-cur');
+    var nextEl = document.getElementById('pv-next');
+    var notesEl = document.getElementById('pv-notes');
+    if (!curEl) return;
+
+    /* Current slide at current fragment step */
+    renderPreview(curEl, cur, frag);
+
+    /* Next preview = next step (not next slide) */
+    var max = maxFrag(slides[cur]);
+    if (frag < max) {
+      /* More fragments on this slide — show current slide at frag+1 */
+      renderPreview(nextEl, cur, frag + 1);
+    } else {
+      /* No more fragments — show next slide at step 0 */
+      renderPreview(nextEl, cur + 1, -1);
+    }
+
+    /* Notes: slide base notes + visible fragment notes */
+    var noteText = buildNotes(slides[cur], frag);
+    notesEl.textContent = noteText || 'No notes.';
+    notesEl.classList.toggle('pv-notes-empty', !noteText);
+  }
+
+  /* Build notes: slide data-notes + data-notes from visible fragments */
+  function buildNotes(slide, step) {
+    var parts = [];
+    var base = slide.dataset.notes;
+    if (base) parts.push(base);
+    slide.querySelectorAll('[data-f]').forEach(function (el) {
+      var f = parseInt(el.dataset.f, 10) || 0;
+      if (f <= step && el.dataset.notes) {
+        parts.push(el.dataset.notes);
+      }
+    });
+    return parts.join('\n\n');
+  }
+
+  /* fragStep: -1 = hide all fragments, 0+ = showUpTo that step */
+  function renderPreview(container, idx, fragStep) {
+    container.innerHTML = '';
+    if (idx < 0 || idx >= slides.length) {
+      container.innerHTML = '<div class="pv-empty">&mdash;</div>';
+      return;
+    }
+    var clone = slides[idx].cloneNode(true);
+    clone.style.cssText = [
+      'display:flex', 'position:absolute', 'inset:auto',
+      'width:' + REF_W + 'px', 'height:' + REF_H + 'px',
+      'transform-origin:top left',
+      'transform:scale(' + (container.clientWidth / REF_W) + ')'
+    ].join(';');
+    if (fragStep >= 0) showUpTo(clone, fragStep);
+    container.appendChild(clone);
+  }
+
+  /* ─── Print mode (?print) ─── */
+  function initPrint() {
+    /* Override body/html overflow for scrollable vertical layout */
+    document.documentElement.style.cssText = 'width:1280px;height:auto;overflow:visible';
+    document.body.style.cssText = 'width:1280px;height:auto;overflow:visible';
+    var app = document.getElementById('app');
+    app.classList.add('print-mode', 'ready');
+    slides.forEach(function (s) {
+      s.classList.add('active');
+      /* Show all fragments */
+      showUpTo(s, maxFrag(s));
+    });
+  }
+
+  /* ─── Keyboard (unified: all arrows step through fragments) ─── */
+  function bindKeys() {
+    document.addEventListener('keydown', function (e) {
+      if (e.metaKey || e.ctrlKey || e.altKey) return;
+      switch (e.key) {
+        case 'ArrowRight': case 'ArrowDown': case ' ': case 'Enter': case 'PageDown':
+          e.preventDefault(); stepDown(); break;
+        case 'ArrowLeft': case 'ArrowUp': case 'Backspace': case 'PageUp':
+          e.preventDefault(); stepUp(); break;
+        case 'Escape':
+          e.preventDefault(); toggleOverview(); break;
+        case 'f': case 'F':
+          e.preventDefault(); toggleFullscreen(); break;
+        case 'p': case 'P':
+          if (!isPresenter) openPresenter(); break;
+      }
+    });
+  }
+
+  /* ─── Touch ─── */
+  function bindTouch() {
+    var sx = 0, sy = 0;
+    var app = document.getElementById('app');
+
+    app.addEventListener('touchstart', function (e) {
+      sx = e.touches[0].clientX;
+      sy = e.touches[0].clientY;
+    }, { passive: true });
+
+    app.addEventListener('touchend', function (e) {
+      var dx = e.changedTouches[0].clientX - sx;
+      var dy = e.changedTouches[0].clientY - sy;
+      if (Math.abs(dx) < 50 || Math.abs(dy) > Math.abs(dx)) return;
+      if (dx < 0) stepDown(); else stepUp();
+    }, { passive: true });
+  }
+
+  /* ─── Boot ─── */
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();</script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.21/dist/katex.min.js" crossorigin="anonymous"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.21/dist/contrib/auto-render.min.js" crossorigin="anonymous"
+  onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}],throwOnError:false,trust:true});"></script>
+<div class="img-overlay" id="img-overlay"><img id="img-overlay-src" src="" alt="Zoomed"></div>
+<script>
+(function(){
+  var ov=document.getElementById('img-overlay'),ovI=document.getElementById('img-overlay-src');
+  document.querySelectorAll('.zoomable').forEach(function(i){i.addEventListener('click',function(e){e.stopPropagation();ovI.src=i.src;ov.classList.add('active');});});
+  ov.addEventListener('click',function(){ov.classList.remove('active');});
+  document.addEventListener('keydown',function(e){if(e.key==='Escape'&&ov.classList.contains('active')){ov.classList.remove('active');e.stopPropagation();}},true);
+  var s=document.querySelectorAll('.slide'),t=s.length;
+  s.forEach(function(sl,i){var p=document.createElement('span');p.className='page-num';p.textContent=(i+1)+' / '+t;sl.appendChild(p);});
+})();
+</script>
+</body>
+</html>
