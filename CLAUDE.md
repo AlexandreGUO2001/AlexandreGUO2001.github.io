@@ -74,6 +74,9 @@ Operational notes:
 
 - Home page: `_pages/about.md`, rendered with `_layouts/about.html`.
 - Publications page: `_pages/publications.md`.
+- Talks page: `_pages/talks.md`, rendered from `_data/talks.yml` via
+  `_includes/talks.html`. Navbar order is About, Blog, then `nav_order`
+  (Publications `1`, Talks `2`).
 - Publications data: `_bibliography/papers.bib`, rendered by `jekyll-scholar`
   through `_layouts/bib.html`. `selected = {true}` marks featured papers.
 - News/announcements: `_news/*.md`, configured as the `news` collection.
@@ -88,8 +91,8 @@ Operational notes:
 - `_layouts/` contains 11 layouts, including `default.html`, `about.html`,
   `bib.html`, `post.html`, `page.html`, `cv.html`, archive layouts, and
   `distill.html`.
-- `_includes/` contains 45 partials, including script loaders, resume/CV
-  sections, repository cards, news, selected papers, and media embeds.
+- `_includes/` contains theme partials, including script loaders, resume/CV
+  sections, repository cards, news, selected papers, talks, and media embeds.
 - `_sass/` contains 6 SCSS partials. `assets/css/main.scss` imports variables,
   themes, layout, base styles, Distill styles, and CV styles.
 - `_plugins/` contains 4 custom Ruby plugins: details tag support, external RSS
@@ -130,6 +133,13 @@ sources, and Plotly assets. Publication PDFs, posters, and slides live under
    `poster`, `slides`, `arxiv`, `preview`, and `website`.
 4. Put preview thumbnails in `assets/img/publication_preview/`.
 5. Add missing coauthor homepage mappings to `_data/coauthors.yml`.
+
+### Adding A Talk
+
+1. Add an entry to `_data/talks.yml` (newest first is automatic by `date`).
+2. Prefer existing optional fields: `venue`, `location`, `description`,
+   `slides`, `video`, `poster`, and `papers`.
+3. Put HTML slides under `assets/html/` and PDFs under `assets/pdf/`.
 
 ### Adding A News Item
 

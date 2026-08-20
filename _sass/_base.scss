@@ -1398,9 +1398,118 @@ h6,
   }
 }
 
+.talks {
+  margin-top: 0.5rem;
+}
+
+.talks-list {
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
+}
+
+.talks-list > li {
+  margin-bottom: 1.15rem;
+}
+
+.talk-card {
+  padding: 1.1rem 1.2rem 1.15rem;
+  border: 1px solid var(--global-divider-color);
+  border-radius: 24px;
+  background: var(--global-card-bg-color);
+  box-shadow: 0 16px 42px color-mix(in srgb, var(--global-shadow-color) 60%, transparent);
+  transition: transform 220ms ease, border-color 220ms ease, box-shadow 220ms ease;
+}
+
+.talk-card:hover {
+  transform: translateY(-3px);
+  border-color: color-mix(in srgb, var(--global-theme-color) 46%, var(--global-divider-color));
+  box-shadow: 0 24px 58px var(--global-shadow-color);
+}
+
+.talk-card__title {
+  font-family: "Bricolage Grotesque", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 1.08rem;
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: -0.03em;
+}
+
+.talk-card__title a {
+  color: var(--global-theme-color);
+  text-decoration: underline;
+  text-decoration-thickness: 0.08em;
+  text-underline-offset: 0.16em;
+  transition: color 160ms ease;
+}
+
+.talk-card__title a:hover {
+  color: var(--global-accent-color);
+}
+
+.talk-card__venue {
+  margin-top: 0.25rem;
+  color: var(--global-text-color-light);
+  font-family: "Lora Figures", Georgia, "Times New Roman", serif;
+}
+
+.talk-card__description {
+  margin: 0.55rem 0 0;
+  color: var(--global-text-color);
+  font-size: 0.94rem;
+  line-height: 1.45;
+}
+
+.talk-card__papers-intro {
+  margin: 0.7rem 0 0.25rem;
+  color: var(--global-text-color);
+  font-size: 0.94rem;
+}
+
+.talk-card__papers {
+  margin: 0.15rem 0 0;
+  padding-left: 1.15rem;
+  color: var(--global-text-color-light);
+  font-size: 0.92rem;
+  line-height: 1.55;
+}
+
+.talk-card__paper-venue {
+  margin-left: 0.25rem;
+  color: var(--global-text-color-light);
+}
+
+.talk-card__links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin-top: 0.7rem;
+}
+
+.talk-card__links a.btn {
+  margin-right: 0;
+  border-radius: 999px;
+  border-color: var(--global-divider-color);
+  background: color-mix(in srgb, var(--global-surface-color-strong) 52%, transparent);
+  font-family: "Bricolage Grotesque", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  text-transform: none;
+  transition: transform 160ms ease, border-color 160ms ease, color 160ms ease;
+}
+
+.talk-card__links a.btn:hover {
+  transform: translateY(-1px);
+  border-color: var(--global-accent-color);
+  color: var(--global-accent-color);
+  text-decoration: none;
+}
+
 .home-hero,
 .news-timeline__item,
-.publications ol.bibliography li {
+.publications ol.bibliography li,
+.talks-list > li {
   animation: rise-in 520ms cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
@@ -1423,9 +1532,11 @@ h6,
   .home-hero,
   .news-timeline__item,
   .publications ol.bibliography li,
+  .talks-list > li,
   .home-hero__chips span,
   .home-hero__actions a,
-  .publications ol.bibliography li .publication-card {
+  .publications ol.bibliography li .publication-card,
+  .talk-card {
     animation: none;
     transition: none;
   }

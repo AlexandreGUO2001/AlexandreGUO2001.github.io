@@ -1,0 +1,76 @@
+{%- assign talks_sorted = site.data.talks | sort: "date" | reverse -%}
+
+<div class="talks">
+  <ol class="talks-list">
+    {%- for talk in talks_sorted -%}
+    {%- assign slides_url = nil -%}
+    {%- if talk.slides -%}
+      {%- if talk.slides contains '://' -%}
+        {%- assign slides_url = talk.slides -%}
+      {%- elsif talk.slides contains '.html' -%}
+        {%- assign slides_url = talk.slides | prepend: '/assets/html/' | relative_url -%}
+      {%- else -%}
+        {%- assign slides_url = talk.slides | prepend: '/assets/pdf/' | relative_url -%}
+      {%- endif -%}
+    {%- endif -%}
+    <li>
+      <div class="talk-card">
+        <div class="talk-card__title">
+          {%- if slides_url -%}
+          <a href="{{ slides_url }}">{{ talk.title }}</a>
+          {%- else -%}
+          {{ talk.title }}
+          {%- endif -%}
+        </div>
+        <div class="talk-card__venue">
+          {{ talk.venue }}{% if talk.location %}, {{ talk.location }}{% endif %},
+          <time datetime="{{ talk.date }}">{{ talk.date | date: "%B %Y" }}</time>
+        </div>
+        {%- if talk.description -%}
+        <p class="talk-card__description">{{ talk.description }}</p>
+        {%- endif -%}
+        {%- if talk.papers -%}
+        {%- assign paper_count = talk.papers | size -%}
+        <p class="talk-card__papers-intro">
+          {%- if paper_count == 1 -%}
+          Based on the following paper:
+          {%- elsif paper_count == 2 -%}
+          Based on the following two papers:
+          {%- else -%}
+          Based on the following papers:
+          {%- endif -%}
+        </p>
+        <ul class="talk-card__papers">
+          {%- for paper in talk.papers -%}
+          <li>
+            {%- if paper.url -%}
+            <a href="{{ paper.url }}">{{ paper.title }}</a>
+            {%- else -%}
+            {{ paper.title }}
+            {%- endif -%}
+            {%- if paper.venue -%}
+            <span class="talk-card__paper-venue">({{ paper.venue }})</span>
+            {%- endif -%}
+          </li>
+          {%- endfor -%}
+        </ul>
+        {%- endif -%}
+        {%- if talk.video or talk.poster -%}
+        <div class="talk-card__links links">
+          {%- if talk.video -%}
+          <a href="{{ talk.video }}" class="btn btn-sm z-depth-0" role="button">Video</a>
+          {%- endif -%}
+          {%- if talk.poster -%}
+            {%- if talk.poster contains '://' -%}
+            <a href="{{ talk.poster }}" class="btn btn-sm z-depth-0" role="button">Poster</a>
+            {%- else -%}
+            <a href="{{ talk.poster | prepend: '/assets/pdf/' | relative_url }}" class="btn btn-sm z-depth-0" role="button">Poster</a>
+            {%- endif -%}
+          {%- endif -%}
+        </div>
+        {%- endif -%}
+      </div>
+    </li>
+    {%- endfor -%}
+  </ol>
+</div>

@@ -1,0 +1,14 @@
+# Talks are shown newest-first on /talks/.
+# Optional fields: location, description, slides, video, poster, papers.
+
+- title: A Unified Complexity Analysis of Annealing
+  date: 2026-06-05
+  venue: Flatiron Institute
+  slides: annealing_talk/slides.html
+  papers:
+    - title: Provable Benefit of Annealed Langevin Monte Carlo for Non-log-concave Sampling
+      venue: ICLR 2025
+      url: https://openreview.net/forum?id=P6IVIoGRRg
+    - title: "Complexity Analysis of Normalizing Constant Estimation: from Jarzynski Equality to Annealed Importance Sampling and beyond"
+      venue: ICLR 2026
+      url: https://openreview.net/forum?id=96fJALwotm
