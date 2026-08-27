@@ -27,6 +27,8 @@
 "Choi":
   - firstname: ["Jaemoo"]
     url: https://jaemoo-choi.github.io/
+  - firstname: ["Jaewoong"]
+    url: https://sites.google.com/view/jaewoongchoi/
 
 "Liu":
   - firstname: ["Guan-Horng"]
@@ -75,3 +77,8 @@
 "Zhang":
   - firstname: ["Shuibai"]
     url: https://zhangshuibai.github.io/
+
+"Berner":
+  - firstname: ["Julius"]
+    url: https://jberner.info/
+
