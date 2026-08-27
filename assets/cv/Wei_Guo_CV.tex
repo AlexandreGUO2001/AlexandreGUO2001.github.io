@@ -14,9 +14,39 @@
     urlcolor=LinkNavy
 }
 \usepackage{enumitem}
+\usepackage{amssymb}
 \usepackage[backend=bibtex, style=numeric, sorting=ydnt, maxnames=99, maxcitenames=99]{biblatex}
 \addbibresource{ref.bib}
 \usepackage{palatino}
+
+% Selected papers: star sits in the left margin of the numeric label.
+\DeclareBibliographyCategory{selected}
+\addtocategory{selected}{%
+  zhu2026enhancing,
+  yang2026continuous,
+  guo2026discrete,
+  guo2026complexity,
+  zhu2025mdns,
+  guo2025provable%
+}
+\newcommand{\selectedstar}{\textcolor{LinkNavy}{\ensuremath{\bigstar}}}
+% Hang the star at the left of the label column so [5] and [10] stay aligned.
+\defbibenvironment{bibliography}
+  {\list
+     {\printtext[labelnumberwidth]{%
+        \printfield{labelprefix}%
+        \printfield{labelnumber}}}
+     {\setlength{\labelwidth}{\labelnumberwidth}%
+      \setlength{\leftmargin}{\labelwidth}%
+      \setlength{\labelsep}{\biblabelsep}%
+      \addtolength{\leftmargin}{\labelsep}%
+      \setlength{\itemsep}{\bibitemsep}%
+      \setlength{\parsep}{\bibparsep}}%
+      \renewcommand*{\makelabel}[1]{%
+        \ifcategory{selected}{\makebox[0pt][r]{\selectedstar\hspace{0.3em}}}{}%
+        \hss##1}}
+  {\endlist}
+  {\item}
 \usepackage[left=0.75in,top=0.75in,right=0.75in,bottom=0.75in]{geometry} % Document margins
 \usepackage{fancyhdr}
 \pagestyle{fancy}
@@ -83,7 +113,7 @@ I study diffusion-based generative models and sampling algorithms, with a curren
 
 
 \begin{rSection}{Preprints and Publications} 
-    (In reversed chronological order. * denotes equal contribution or alphabetical order.)
+    (In reversed chronological order. {\selectedstar} denotes selected papers. * denotes equal contribution or alphabetical order.)
     \itemsep -2pt
     \nocite{*}\leavevmode\printbibliography[heading=none]
 \end{rSection}
@@ -137,6 +167,7 @@ Lecturer: \href{https://yongxin.ae.gatech.edu/}{Yongxin Chen}.
     2023 Beijing Outstanding Undergraduate Graduate Award \hfill {\em Jul 2023} \\
     Best poster award at Yale FDS conference ``Recent Advances and Future Directions for Sampling'' \\
     \phantom{.} \hfill {\em Oct 2024} \\
+    2026 Georgia Tech ARC-ACO student fellowship \hfill {\em Jan 2026} \\
     Gold reviewer award at ICML 2026 \hfill {\em May 2026} \\
 \end{rSection}
 
