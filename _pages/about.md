@@ -31,13 +31,17 @@ social: true  # includes social icons at the bottom of the page
   <p class="about-kicker">Academic Interests</p>
   <p>I am broadly interested in fields ranging from statistics, probability, and machine learning. My current research interests include but are not limited to:</p>
   <div class="research-focus-grid">
-    <article class="research-focus-card">
+    <article class="research-focus-card research-focus-card--featured">
       <span class="research-focus-card__label">Generative Models</span>
-      <p>I think about fundamental ways of generating data. In particular, I focus on (continuous and discrete) diffusion/flow-based models with applications to vision, language, and scientific domains.</p>
+      <p>I think about fundamental ways of generating data and how to improve generative models for aligning with human preferences. In particular, I focus on (continuous and discrete) diffusion/flow-based models, working across pretraining [<a href="/publications/#yang2026continuous">RePlaid</a>], RL-based post-training [<a href="/publications/#zhu2026enhancing">DMPO</a>, <a href="/publications/#choi2026rethinking">Rethinking RL</a>, <a href="/publications/#choi2026scaling">RVM</a>], and inference-time scaling [<a href="/publications/#ren2025fast">fast discrete diffusion solver</a>], with applications to language, vision, and scientific domains.</p>
     </article>
     <article class="research-focus-card">
       <span class="research-focus-card__label">Sampling Theory</span>
-      <p>Due to my math background, I'm also interested in the theoretical analysis and practical design of sampling algorithms, including Markov chain Monte Carlo, non-equilibrium (e.g., denoising diffusion, stochastic localization) methods, and learning-based neural samplers. Meanwhile, I also work on applied stochastic analysis with connections to optimal transport, stochastic optimal control, and statistical physics.</p>
+      <p>Coming from a math background, I've also worked on the theoretical analysis and practical design of sampling algorithms, including Markov chain Monte Carlo, non-equilibrium methods [<a href="/publications/#guo2025provable">Annealing-based sampling</a>, <a href="/publications/#guo2026complexity">Jarzynski equality</a>] and learning-based neural samplers [<a href="/publications/#zhu2025mdns">MDNS</a>, <a href="/publications/#guo2026proximal">PDNS</a>, <a href="/publications/#guo2026discrete">DASBS</a>, <a href="/publications/#du2026metadns">MetaDNS</a>], with connections to optimal transport, stochastic optimal control [<a href="/publications/#shin2026efficient">EAM</a>], and statistical physics.</p>
+    </article>
+    <article class="research-focus-card">
+      <span class="research-focus-card__label">AI-Assisted Theoretical Research</span>
+      <p>A newer interest of mine is leveraging modern AI agents, together with the mathematical intuition we have built up, to accelerate theoretical research. Although most of my effort currently goes into empirical research, I hope to invest more in it going forward.</p>
     </article>
   </div>
 </section>

@@ -17,23 +17,13 @@ Pages from the generated `_site` directory.
 
 ## Build & Serve Commands
 
+One-liner for local preview at http://127.0.0.1:4000/ (auto-rebuilds on save):
+
 ```bash
-# Local development with the prebuilt al-folio Docker image
-docker-compose up                    # serves at http://localhost:8080
-
-# Local development with the repo Dockerfile
-docker-compose -f docker-local.yml up # serves at http://localhost:8080
-
-# Native Ruby
-bundle install
-bundle exec jekyll serve --lsi       # serves at http://localhost:4000
-
-# Production build, matching CI
-JEKYLL_ENV=production bundle exec jekyll build
-
-# Legacy build helper
-bin/cibuild                          # runs bundle exec jekyll build --lsi
+PATH="/Users/weiguo/Library/Python/3.9/bin:/opt/homebrew/opt/ruby@3.2/bin:$PATH" bundle exec jekyll serve --lsi
 ```
+
+CI uses `JEKYLL_ENV=production bundle exec jekyll build`; Docker (`docker-compose up`) and `bin/cibuild` / `bin/deploy` also exist but are not needed for day-to-day editing.
 
 CI is defined in `.github/workflows/deploy.yml`. It runs on pushes and pull
 requests to `main`/`master`, uses Ruby 3.2.2 with Bundler cache, installs
