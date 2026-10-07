@@ -82,3 +82,39 @@
   - firstname: ["Julius"]
     url: https://jberner.info/
 
+"Lemercier":
+  - firstname: ["Jean-Marie"]
+    url: https://jmlemercier.github.io/
+
+"Welker":
+  - firstname: ["Simon"]
+    url: https://github.com/cobalamin
+
+"Fu":
+  - firstname: ["Yonggan"]
+    url: https://www.yongganfu.com/
+
+"Kamani":
+  - firstname: ["Mohammad Mahdi"]
+    url: https://mmkamani.com/
+
+"Norouzi":
+  - firstname: ["Sajad"]
+    url: https://www.cs.toronto.edu/~sajadn/
+
+"Geffner":
+  - firstname: ["Tomas"]
+    url: https://tomasgeffner.github.io/
+
+"Kreis":
+  - firstname: ["Karsten"]
+    url: https://karstenkreis.github.io/
+
+"Molchanov":
+  - firstname: ["Pavlo"]
+    url: https://pmolchanov.com/
+
+"Jukić":
+  - firstname: ["Ante"]
+    url: https://scholar.google.com/citations?user=ZleK6ccAAAAJ&hl=en
+

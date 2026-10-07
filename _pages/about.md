@@ -33,7 +33,7 @@ social: true  # includes social icons at the bottom of the page
   <div class="research-focus-grid">
     <article class="research-focus-card research-focus-card--featured">
       <span class="research-focus-card__label">Generative Models</span>
-      <p>I think about fundamental ways of generating data and how to improve generative models for aligning with human preferences. In particular, I focus on (continuous and discrete) diffusion/flow-based models, working across pretraining [<a href="/publications/#yang2026continuous">RePlaid</a>], RL-based post-training [<a href="/publications/#zhu2026enhancing">DMPO</a>, <a href="/publications/#choi2026rethinking">Rethinking RL</a>, <a href="/publications/#choi2026scaling">RVM</a>], and inference-time scaling [<a href="/publications/#ren2025fast">fast discrete diffusion solver</a>], with applications to language, vision, and scientific domains.</p>
+      <p>I think about fundamental ways of generating data and how to improve generative models for aligning with human preferences. In particular, I focus on (continuous and discrete) diffusion/flow-based models, working across pretraining [<a href="/publications/#yang2026continuous">RePlaid</a>, <a href="/publications/#yang2026large">Sigma</a>], RL-based post-training [<a href="/publications/#zhu2026enhancing">DMPO</a>, <a href="/publications/#choi2026rethinking">Rethinking RL</a>, <a href="/publications/#choi2026scaling">RVM</a>], and inference-time scaling [<a href="/publications/#ren2025fast">fast discrete diffusion solver</a>], with applications to language, vision, and scientific domains.</p>
     </article>
     <article class="research-focus-card">
       <span class="research-focus-card__label">Sampling Theory</span>
