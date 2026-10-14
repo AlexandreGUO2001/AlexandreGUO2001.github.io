@@ -41,7 +41,7 @@ social: true  # includes social icons at the bottom of the page
     </article>
     <article class="research-focus-card">
       <span class="research-focus-card__label">AI-Assisted Theoretical Research</span>
-      <p>A newer interest of mine is leveraging modern AI agents, together with the mathematical intuition we have built up, to accelerate theoretical research. Although most of my effort currently goes into empirical research, I hope to invest more in it going forward.</p>
+      <p>A newer interest of mine is leveraging modern AI agents, together with the mathematical intuition we have built up, to accelerate theoretical research. Although most of my effort currently goes into empirical research, I hope to invest more in it going forward. Here is a preliminary attempt: <a href="https://arxiv.org/abs/2610.16248">Reflected proximal sampler</a>.</p>
     </article>
   </div>
 </section>
